@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 
-export default function ExemploScreen() {
+export default function Buscar() {
   return (
     <View style={styles.container}>
-      <Text>SOU UM EXEMPLO</Text>
+      <Text>Pesquisar Decks</Text>
       <Pressable onPress={() => router.back()}>
         <Text>Voltar</Text>
       </Pressable>
@@ -15,7 +15,7 @@ export default function ExemploScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2df',
+    backgroundColor: '#fcc',
     alignItems: 'center',
     justifyContent: 'center',
   },

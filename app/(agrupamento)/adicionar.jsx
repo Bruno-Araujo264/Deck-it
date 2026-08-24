@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 
-export default function SobreScreen() {
+export default function Adicionar() {
   return (
     <View style={styles.container}>
-      <Text>Tela app/sobre</Text>
+      <Text>SOU UM EXEMPLO</Text>
       <Pressable onPress={() => router.back()}>
         <Text>Voltar</Text>
       </Pressable>
@@ -15,7 +15,7 @@ export default function SobreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fcc',
+    backgroundColor: '#2df',
     alignItems: 'center',
     justifyContent: 'center',
   },
