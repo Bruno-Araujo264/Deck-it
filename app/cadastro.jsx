@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   KeyboardAvoidingView,
@@ -78,9 +79,9 @@ export default function Cadastro() {
             </Pressable>
 
             <View style={styles.createAccountRow}>
-              <Text style={styles.helperText}>Não possui uma conta?</Text>
-              <Pressable>
-                <Text style={styles.actionText}> Crie uma!</Text>
+              <Text style={styles.helperText}>Já possui uma conta?</Text>
+              <Pressable onPress={() => router.push('/login')}>
+                <Text style={styles.actionText}> Faça login!</Text>
               </Pressable>
             </View>
 
