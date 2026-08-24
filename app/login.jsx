@@ -65,7 +65,7 @@ export default function LoginScreen() {
               <Text style={styles.forgotText}>Esqueceu a senha?</Text>
             </Pressable>
 
-            <Pressable style={styles.loginButton}>
+            <Pressable style={styles.loginButton} onPress={() => router.push('/home')}>
               <Text style={styles.loginButtonText}>Entrar</Text>
             </Pressable>
 
