@@ -6,6 +6,7 @@ const tabIcons = {
   buscar: '⌕',
   decks: '□',
   adicionar: '+',
+  perfil: '♙',
 };
 
 export default function GroupLayout() {
@@ -35,6 +36,7 @@ export default function GroupLayout() {
       <Tabs.Screen name="buscar" options={{ title: 'Busca' }} />
       <Tabs.Screen name="decks" options={{ title: 'Decks' }} />
       <Tabs.Screen name="adicionar" options={{ title: 'Adicionar' }} />
+      <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
       <Tabs.Screen name="carta" options={{ href: null }} />
     </Tabs>
   );
