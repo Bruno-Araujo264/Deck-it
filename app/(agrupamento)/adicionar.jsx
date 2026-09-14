@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import {
   Alert,
   Image,
+  Linking,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -39,6 +40,22 @@ export default function Adicionar() {
     ]);
   }
 
+  function handlePermissionPress() {
+    if (permission.canAskAgain) {
+      requestPermission();
+      return;
+    }
+
+    Alert.alert(
+      'Permissão bloqueada',
+      'A câmera foi recusada. Permita o acesso nas configurações do dispositivo para continuar.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Abrir configurações', onPress: Linking.openSettings },
+      ],
+    );
+  }
+
   if (!permission) {
     return <View style={styles.loading} />;
   }
@@ -51,7 +68,7 @@ export default function Adicionar() {
         <Text style={styles.permissionText}>
           O Deck-it precisa da câmera para fotografar suas cartas.
         </Text>
-        <Pressable style={styles.permissionButton} onPress={requestPermission}>
+        <Pressable style={styles.permissionButton} onPress={handlePermissionPress}>
           <Text style={styles.permissionButtonText}>Permitir câmera</Text>
         </Pressable>
       </SafeAreaView>
@@ -77,8 +94,11 @@ export default function Adicionar() {
             style={styles.preview}
             facing="back"
             mode="picture"
-            autofocus="on"
             onCameraReady={() => setCameraReady(true)}
+            onMountError={({ message }) => {
+              setCameraReady(false);
+              Alert.alert('Não foi possível iniciar a câmera', message);
+            }}
           />
         )}
         <View pointerEvents="none" style={styles.cardGuide} />
@@ -139,7 +159,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#202020',
   },
-  preview: { ...StyleSheet.absoluteFillObject },
+  preview: { flex: 1, width: '100%' },
   cardGuide: {
     position: 'absolute',
     width: '64%',

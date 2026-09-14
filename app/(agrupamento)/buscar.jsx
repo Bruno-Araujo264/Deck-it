@@ -68,7 +68,6 @@ export default function Buscar() {
                   style={styles.deckImage}
                   resizeMode="cover"
                 />
-                <View style={styles.imageBadge}>IMAGE</View>
               </View>
               <Text style={styles.deckName} numberOfLines={1}>{deck.name}</Text>
               <Text style={styles.cardCount}>{deck.cards}</Text>
@@ -131,18 +130,8 @@ const styles = StyleSheet.create({
     borderColor: '#383e7b',
   },
   deckImage: {
-    position: 'absolute',
-    top: 0,
     width: '100%',
-    height: '300%',
-  },
-  imageBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 2,
-    color: '#8588b3',
-    fontSize: 7,
-    backgroundColor: '#101126',
+    height: '100%',
   },
   deckName: { color: '#f4f4fb', fontSize: 12, fontWeight: '700', marginTop: 8 },
   cardCount: { color: '#8588b3', fontSize: 10, marginTop: 3 },
