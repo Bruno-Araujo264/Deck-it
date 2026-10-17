@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Um jogo (Pokémon, Magic, Lorcana...)
+model Game {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique @db.VarChar(50)
+  name      String   @db.VarChar(100)
+  sourceApi String   @map("source_api") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  sets      CardSet[]
+  cards     Card[]
+  trackedBy UserTrackedGame[]
+
+  @@map("games")
+}
+
+/// Uma coleção/expansão dentro de um jogo
+model CardSet {
+  id          Int       @id @default(autoincrement())
+  gameId      Int       @map("game_id")
+  externalId  String    @map("external_id") @db.VarChar(100)
+  name        String    @db.VarChar(150)
+  releaseDate DateTime? @map("release_date") @db.Date
+  totalCards  Int?      @map("total_cards")
+  imageUrl    String?   @map("image_url")
+
+  game  Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  cards Card[]
+
+  @@unique([gameId, externalId])
+  @@map("sets")
+}
+
+/// Carta individual (catálogo mestre). Campos específicos de cada jogo ficam em attributes.
+model Card {
+  id              Int      @id @default(autoincrement())
+  gameId          Int      @map("game_id")
+  setId           Int      @map("set_id")
+  externalId      String   @map("external_id") @db.VarChar(100)
+  name            String   @db.VarChar(200)
+  collectorNumber String?  @map("collector_number") @db.VarChar(20)
+  rarity          String?  @db.VarChar(50)
+  imageUrl        String?  @map("image_url")
+  attributes      Json     @default("{}")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  game        Game             @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  set         CardSet          @relation(fields: [setId], references: [id], onDelete: Cascade)
+  collections UserCollection[]
+
+  @@unique([gameId, externalId])
+  @@index([setId])
+  @@map("cards")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  collection   UserCollection[]
+  trackedGames UserTrackedGame[]
+
+  @@map("users")
+}
+
+/// O "checkbox": a existência de uma linha aqui significa que o usuário possui a carta.
+model UserCollection {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  cardId    Int      @map("card_id")
+  quantity  Int      @default(1)
+  variant   String   @default("normal") @db.VarChar(50)
+  condition String   @default("near_mint") @db.VarChar(30)
+  addedAt   DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, variant])
+  @@index([userId])
+  @@map("user_collection")
+}
+
+/// Jogos que o usuário escolheu acompanhar
+model UserTrackedGame {
+  userId Int @map("user_id")
+  gameId Int @map("game_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId])
+  @@map("user_tracked_games")
+}
