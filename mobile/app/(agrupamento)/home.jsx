@@ -38,16 +38,6 @@ export default function HomeScreen() {
 							<Text style={styles.title}>Deck-It</Text>
 						</View>
 
-						<View style={styles.searchBox}>
-							<Text style={styles.searchIcon}>⌕</Text>
-							<TextInput
-								style={styles.searchInput}
-								placeholder="Search decks or cards..."
-								placeholderTextColor="#8588b3"
-								returnKeyType="search"
-							/>
-						</View>
-
 						<Text style={styles.sectionTitle}>Game Categories</Text>
 						<FlatList
 							horizontal
