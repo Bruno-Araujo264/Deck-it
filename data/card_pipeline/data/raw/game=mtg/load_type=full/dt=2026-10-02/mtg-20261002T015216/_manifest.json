@@ -1,0 +1,17 @@
+{
+  "written_at": "2026-10-02T01:52:20.455304+00:00",
+  "files": [
+    {
+      "name": "default-cards.jsonl.gz",
+      "bytes": 78688642,
+      "sha256": "acc722dc04cbd12d62ca1bb0f909e9323d2365fadf177a04d97ed1dc60618877"
+    }
+  ],
+  "load_id": "mtg-20261002T015216",
+  "game": "mtg",
+  "load_type": "full",
+  "source_url": "https://data.scryfall.io/default-cards/default-cards-20261001210549.jsonl.gz",
+  "source_version": "2026-10-01T21:05:49.398+00:00",
+  "bulk_type": "default_cards",
+  "reported_size": 78688642
+}
