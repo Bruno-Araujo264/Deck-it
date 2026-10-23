@@ -1,0 +1,488 @@
+2026-10-02 23:27:28 WARNING [mtg-20261002T015216] retomando carga interrompida (status=bronze_loaded)
+2026-10-02 23:27:28 INFO    [mtg-20261002T015216] etapa 3/3: silver
+2026-10-02 23:27:55 INFO    silver: staging com 118,467 cartas deduplicadas (26s)
+2026-10-02 23:27:55 INFO    silver: card_set             1,052 linhas afetadas (0.2s)
+2026-10-02 23:27:56 INFO    [mtg] tempo total: 28s
+2026-10-02 23:27:56 ERROR   [mtg] FALHOU
+Traceback (most recent call last):
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 102, in main
+    run_game(game, GAMES[game], force_full=args.mode == "full")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 47, in run_game
+    process(conn, mod, row)
+    ~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 31, in process
+    mod.transform_silver(conn, load_id, row["source_version"][:10])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/games/scryfall/silver.py", line 128, in transform_silver
+    cur.execute(sql, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/cursors.py", line 170, in execute
+    result = self._query(query)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/cursors.py", line 335, in _query
+    conn.query(q)
+    ~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 581, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 857, in _read_query_result
+    result.read()
+    ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 1290, in read
+    first_packet = self.connection._read_packet()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 810, in _read_packet
+    packet.raise_for_error()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/err.py", line 154, in raise_mysql_exception
+    raise errorclass(errno, errval, sqlstate=sqlstate)
+pymysql.err.OperationalError: (1052, "Column 'name' in field list is ambiguous")
+2026-10-02 23:29:08 WARNING [mtg-20261002T015216] retomando carga interrompida (status=bronze_loaded)
+2026-10-02 23:29:08 INFO    [mtg-20261002T015216] etapa 3/3: silver
+2026-10-02 23:29:20 INFO    silver: staging com 118,467 cartas deduplicadas (13s)
+2026-10-02 23:29:20 INFO    silver: card_set             1,052 linhas afetadas (0.1s)
+2026-10-02 23:29:23 INFO    silver: card                 118,467 linhas afetadas (2.7s)
+2026-10-02 23:29:27 INFO    [mtg] tempo total: 19s
+2026-10-02 23:29:27 ERROR   [mtg] FALHOU
+Traceback (most recent call last):
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 102, in main
+    run_game(game, GAMES[game], force_full=args.mode == "full")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 47, in run_game
+    process(conn, mod, row)
+    ~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 31, in process
+    mod.transform_silver(conn, load_id, row["source_version"][:10])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/games/scryfall/silver.py", line 128, in transform_silver
+    cur.execute(sql, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/cursors.py", line 170, in execute
+    result = self._query(query)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/cursors.py", line 335, in _query
+    conn.query(q)
+    ~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 581, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 857, in _read_query_result
+    result.read()
+    ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 1290, in read
+    first_packet = self.connection._read_packet()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/connections.py", line 810, in _read_packet
+    packet.raise_for_error()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pymysql/err.py", line 154, in raise_mysql_exception
+    raise errorclass(errno, errval, sqlstate=sqlstate)
+pymysql.err.DataError: (1264, "Out of range value for column 'cmc' at row 19614")
+2026-10-02 23:31:12 WARNING [mtg-20261002T015216] retomando carga interrompida (status=bronze_loaded)
+2026-10-02 23:31:12 INFO    [mtg-20261002T015216] etapa 3/3: silver
+2026-10-02 23:31:28 INFO    silver: staging com 118,467 cartas deduplicadas (16s)
+2026-10-02 23:31:28 INFO    silver: card_set             1,052 linhas afetadas (0.2s)
+2026-10-02 23:31:31 INFO    silver: card                 118,467 linhas afetadas (2.6s)
+2026-10-02 23:31:33 INFO    silver: card_mtg             118,467 linhas afetadas (2.2s)
+2026-10-02 23:31:33 INFO    silver: card_face            10,421 linhas afetadas (0.3s)
+2026-10-02 23:31:43 INFO    silver: card_image (carta)   685,374 linhas afetadas (9.6s)
+2026-10-02 23:31:44 INFO    silver: card_image (faces)   48,912 linhas afetadas (1.0s)
+2026-10-02 23:31:49 INFO    silver: card_price           356,468 linhas afetadas (4.8s)
+2026-10-02 23:31:49 INFO    [mtg-20261002T015216] carga concluida
+2026-10-02 23:31:49 INFO    [mtg] consultando versao na fonte
+2026-10-02 23:31:50 INFO    [mtg-20261003T023150] nova carga INCREMENTAL, versao 2026-10-02T21:05:53.875+00:00
+2026-10-02 23:31:50 INFO    [mtg-20261003T023150] etapa 1/3: extracao (raw)
+2026-10-02 23:31:51 INFO    download iniciado (79 MB)
+2026-10-02 23:31:52 INFO    download: 52 MB (2s)
+2026-10-02 23:31:53 INFO    download concluido: 79 MB em 3s
+2026-10-02 23:31:53 INFO    [mtg-20261003T023150] raw salvo em data/raw/game=mtg/load_type=incremental/dt=2026-10-03/mtg-20261003T023150/default-cards.jsonl.gz
+2026-10-02 23:31:53 INFO    [mtg-20261003T023150] etapa 2/3: bronze
+2026-10-02 23:31:59 INFO    bronze: 10,000 linhas inseridas (6s)
+2026-10-02 23:32:05 INFO    bronze: 20,000 linhas inseridas (11s)
+2026-10-02 23:32:11 INFO    bronze: 30,000 linhas inseridas (17s)
+2026-10-02 23:32:16 INFO    bronze: 40,000 linhas inseridas (23s)
+2026-10-02 23:32:22 INFO    bronze: 50,000 linhas inseridas (28s)
+2026-10-02 23:32:28 INFO    bronze: 60,000 linhas inseridas (34s)
+2026-10-02 23:32:33 INFO    bronze: 70,000 linhas inseridas (40s)
+2026-10-02 23:32:39 INFO    bronze: 80,000 linhas inseridas (46s)
+2026-10-02 23:32:45 INFO    bronze: 90,000 linhas inseridas (51s)
+2026-10-02 23:32:50 INFO    bronze: 100,000 linhas inseridas (57s)
+2026-10-02 23:32:53 INFO    bronze: 101,495 linhas inseridas no total (59s)
+2026-10-02 23:32:53 INFO    [mtg-20261003T023150] etapa 3/3: silver
+2026-10-02 23:33:04 INFO    silver: staging com 101,495 cartas deduplicadas (12s)
+2026-10-02 23:33:05 INFO    silver: card_set             1,722 linhas afetadas (0.1s)
+2026-10-02 23:33:07 INFO    silver: card                 104 linhas afetadas (2.1s)
+2026-10-02 23:33:09 INFO    silver: card_mtg             2 linhas afetadas (2.7s)
+2026-10-02 23:33:10 INFO    silver: card_face            9,514 linhas afetadas (0.2s)
+2026-10-02 23:33:25 INFO    silver: card_image (carta)   1,200,324 linhas afetadas (15.3s)
+2026-10-02 23:33:26 INFO    silver: card_image (faces)   35,232 linhas afetadas (0.6s)
+2026-10-02 23:33:31 INFO    silver: card_price           331,994 linhas afetadas (5.6s)
+2026-10-02 23:33:32 INFO    [mtg-20261003T023150] carga concluida
+2026-10-02 23:33:32 INFO    [mtg] tempo total: 140s
+2026-10-02 23:42:42 WARNING [mtg-20261003T023150] retomando carga interrompida (status=bronze_loaded)
+2026-10-02 23:42:42 INFO    [mtg-20261003T023150] etapa 3/3: silver
+2026-10-02 23:42:53 INFO    silver: staging com 101,495 cartas deduplicadas (11s)
+2026-10-02 23:42:53 INFO    silver: card_set             1,722 linhas afetadas (0.2s)
+2026-10-02 23:42:55 INFO    silver: card                 0 linhas afetadas (2.1s)
+2026-10-02 23:42:58 INFO    silver: card_mtg             17,622 linhas afetadas (2.9s)
+2026-10-02 23:42:58 INFO    silver: card_face            9,514 linhas afetadas (0.2s)
+2026-10-02 23:43:13 INFO    silver: card_image (carta)   1,200,324 linhas afetadas (14.7s)
+2026-10-02 23:43:13 INFO    silver: card_image (faces)   35,232 linhas afetadas (0.6s)
+2026-10-02 23:43:18 INFO    silver: card_price           0 linhas afetadas (4.9s)
+2026-10-02 23:43:19 INFO    [mtg-20261003T023150] carga concluida
+2026-10-02 23:43:19 INFO    [mtg] consultando versao na fonte
+2026-10-02 23:43:19 INFO    [mtg] sem mudancas (versao 2026-10-02T21:05:53.875+00:00), nada a fazer
+2026-10-02 23:43:19 INFO    [mtg] tempo total: 38s
+2026-10-06 18:20:13 INFO    [mtg] consultando versao na fonte
+2026-10-06 18:20:13 WARNING Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:20:16 WARNING Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:20:22 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:20:34 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:20:58 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:20:58 INFO    [mtg] tempo total: 46s
+2026-10-06 18:20:58 ERROR   [mtg] FALHOU
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connection.py", line 878, in connect
+    wrapped_socket, is_verified = _ssl_wrap_socket_and_match_hostname(
+                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<14 lines>...
+        assert_fingerprint=self.assert_fingerprint,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connection.py", line 1080, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+        sock=sock,
+    ...<8 lines>...
+        tls_in_tls=tls_in_tls,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 437, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 481, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 469, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 1087, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 1383, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 494, in _make_request
+    raise new_e
+urllib3.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  [Previous line repeated 2 more times]
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.scryfall.com', port=443): Max retries exceeded with url: /bulk-data (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 102, in main
+    run_game(game, GAMES[game], force_full=args.mode == "full")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 53, in run_game
+    version, meta = mod.get_remote_version()  # 2) ha versao nova na fonte?
+                    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Downloads/card_pipeline/games/scryfall/extract.py", line 11, in get_remote_version
+    data = get_json(BULK_URL)["data"]
+           ~~~~~~~~^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/common/http.py", line 32, in get_json
+    r = SESSION.get(url, params=params, timeout=30)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/adapters.py", line 727, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='api.scryfall.com', port=443): Max retries exceeded with url: /bulk-data (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)')))
+2026-10-06 18:21:56 INFO    [mtg] consultando versao na fonte
+2026-10-06 18:21:56 WARNING Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:21:59 WARNING Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:22:05 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:22:08 INFO    [mtg] tempo total: 12s
+2026-10-06 18:33:25 INFO    [mtg] consultando versao na fonte
+2026-10-06 18:33:25 WARNING Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:33:28 WARNING Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:33:35 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:33:47 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:34:11 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)'))': /bulk-data
+2026-10-06 18:34:11 INFO    [mtg] tempo total: 46s
+2026-10-06 18:34:11 ERROR   [mtg] FALHOU
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connection.py", line 878, in connect
+    wrapped_socket, is_verified = _ssl_wrap_socket_and_match_hostname(
+                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<14 lines>...
+        assert_fingerprint=self.assert_fingerprint,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connection.py", line 1080, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+        sock=sock,
+    ...<8 lines>...
+        tls_in_tls=tls_in_tls,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 437, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 481, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 469, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 1087, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/ssl.py", line 1383, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 494, in _make_request
+    raise new_e
+urllib3.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  [Previous line repeated 2 more times]
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/urllib3/util/retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.scryfall.com', port=443): Max retries exceeded with url: /bulk-data (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 102, in main
+    run_game(game, GAMES[game], force_full=args.mode == "full")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/run.py", line 53, in run_game
+    version, meta = mod.get_remote_version()  # 2) ha versao nova na fonte?
+                    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/macbook/Downloads/card_pipeline/games/scryfall/extract.py", line 11, in get_remote_version
+    data = get_json(BULK_URL)["data"]
+           ~~~~~~~~^^^^^^^^^^
+  File "/Users/macbook/Downloads/card_pipeline/common/http.py", line 32, in get_json
+    r = SESSION.get(url, params=params, timeout=30)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/adapters.py", line 727, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='api.scryfall.com', port=443): Max retries exceeded with url: /bulk-data (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1082)')))
+2026-10-23 09:27:26 WARNING [mtg-20261002T015216] retomando carga interrompida (status=bronze_loaded)
+2026-10-23 09:27:26 INFO    [mtg-20261002T015216] etapa 3/3: silver
+2026-10-23 09:27:33 INFO    silver: staging com 118,467 cartas deduplicadas (7s)
+2026-10-23 09:27:35 INFO    silver: tratamento aplicado (2s)
+2026-10-23 09:27:41 INFO    silver: card         118,467 linhas afetadas (6.2s)
+2026-10-23 09:27:49 INFO    silver: card_price   0 linhas afetadas (8.3s)
+2026-10-23 09:27:49 INFO    [mtg-20261002T015216] carga concluida
+2026-10-23 09:27:49 WARNING [mtg-20261003T023150] retomando carga interrompida (status=bronze_loaded)
+2026-10-23 09:27:49 INFO    [mtg-20261003T023150] etapa 3/3: silver
+2026-10-23 09:27:53 INFO    silver: staging com 101,495 cartas deduplicadas (4s)
+2026-10-23 09:27:55 INFO    silver: tratamento aplicado (1s)
+2026-10-23 09:27:59 INFO    silver: card         106 linhas afetadas (4.4s)
+2026-10-23 09:28:06 INFO    silver: card_price   0 linhas afetadas (7.2s)
+2026-10-23 09:28:06 INFO    [mtg-20261003T023150] carga concluida
+2026-10-23 09:28:06 INFO    [mtg] consultando versao na fonte
+2026-10-23 09:28:07 INFO    [mtg-20261023T122807] nova carga INCREMENTAL, versao 2026-10-23T09:05:40.788+00:00
+2026-10-23 09:28:07 INFO    [mtg-20261023T122807] etapa 1/3: extracao (raw)
+2026-10-23 09:28:07 INFO    download iniciado (80 MB)
+2026-10-23 09:28:09 INFO    download: 52 MB (2s)
+2026-10-23 09:28:10 INFO    download concluido: 80 MB em 3s
+2026-10-23 09:28:10 INFO    [mtg-20261023T122807] raw salvo em data/raw/game=mtg/load_type=incremental/dt=2026-10-23/mtg-20261023T122807/default-cards.jsonl.gz
+2026-10-23 09:28:10 INFO    [mtg-20261023T122807] etapa 2/3: bronze
+2026-10-23 09:28:18 INFO    bronze: 10,000 linhas inseridas (7s)
+2026-10-23 09:28:25 INFO    bronze: 20,000 linhas inseridas (15s)
+2026-10-23 09:28:32 INFO    bronze: 30,000 linhas inseridas (21s)
+2026-10-23 09:28:38 INFO    bronze: 40,000 linhas inseridas (28s)
+2026-10-23 09:28:44 INFO    bronze: 50,000 linhas inseridas (34s)
+2026-10-23 09:28:50 INFO    bronze: 60,000 linhas inseridas (39s)
+2026-10-23 09:28:56 INFO    bronze: 70,000 linhas inseridas (45s)
+2026-10-23 09:29:03 INFO    bronze: 80,000 linhas inseridas (53s)
+2026-10-23 09:29:11 INFO    bronze: 90,000 linhas inseridas (60s)
+2026-10-23 09:29:17 INFO    bronze: 100,000 linhas inseridas (66s)
+2026-10-23 09:29:23 INFO    bronze: 110,000 linhas inseridas (72s)
+2026-10-23 09:29:30 INFO    bronze: 118,996 linhas inseridas no total (80s)
+2026-10-23 09:29:31 INFO    [mtg-20261023T122807] etapa 3/3: silver
+2026-10-23 09:29:33 INFO    silver: staging com 118,996 cartas deduplicadas (3s)
+2026-10-23 09:29:35 INFO    silver: tratamento aplicado (2s)
+2026-10-23 09:29:41 INFO    silver: card         11,895 linhas afetadas (6.1s)
+2026-10-23 09:29:50 INFO    silver: card_price   357,079 linhas afetadas (8.9s)
+2026-10-23 09:29:50 INFO    [mtg-20261023T122807] carga concluida
+2026-10-23 09:29:50 INFO    [mtg] tempo total: 144s
+2026-10-23 09:38:15 WARNING [mtg-20261002T015216] retomando carga interrompida (status=bronze_loaded)
+2026-10-23 09:38:15 INFO    [mtg-20261002T015216] etapa 3/3: silver
+2026-10-23 09:38:20 INFO    silver: staging com 118,467 cartas deduplicadas (5s)
+2026-10-23 09:38:21 INFO    silver: tratamento aplicado (1s)
+2026-10-23 09:38:25 INFO    silver: card         11,588 linhas afetadas (4.1s)
+2026-10-23 09:38:31 INFO    silver: card_price   0 linhas afetadas (5.6s)
+2026-10-23 09:38:31 INFO    [mtg-20261002T015216] carga concluida
+2026-10-23 09:38:31 WARNING [mtg-20261003T023150] retomando carga interrompida (status=bronze_loaded)
+2026-10-23 09:38:31 INFO    [mtg-20261003T023150] etapa 3/3: silver
+2026-10-23 09:38:35 INFO    silver: staging com 101,495 cartas deduplicadas (4s)
+2026-10-23 09:38:36 INFO    silver: tratamento aplicado (1s)
+2026-10-23 09:38:39 INFO    silver: card         106 linhas afetadas (3.4s)
+2026-10-23 09:38:44 INFO    silver: card_price   0 linhas afetadas (5.1s)
+2026-10-23 09:38:44 INFO    [mtg-20261003T023150] carga concluida
+2026-10-23 09:38:44 WARNING [mtg-20261023T122807] retomando carga interrompida (status=bronze_loaded)
+2026-10-23 09:38:44 INFO    [mtg-20261023T122807] etapa 3/3: silver
+2026-10-23 09:38:48 INFO    silver: staging com 118,996 cartas deduplicadas (4s)
+2026-10-23 09:38:49 INFO    silver: tratamento aplicado (1s)
+2026-10-23 09:38:53 INFO    silver: card         11,454 linhas afetadas (4.2s)
+2026-10-23 09:38:59 INFO    silver: card_price   0 linhas afetadas (5.4s)
+2026-10-23 09:38:59 INFO    [mtg-20261023T122807] carga concluida
+2026-10-23 09:38:59 INFO    [mtg] consultando versao na fonte
+2026-10-23 09:39:00 INFO    [mtg] sem mudancas (versao 2026-10-23T09:05:40.788+00:00), nada a fazer
+2026-10-23 09:39:00 INFO    [mtg] tempo total: 45s
