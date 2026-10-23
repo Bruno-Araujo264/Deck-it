@@ -1,0 +1,23 @@
+info:
+  name: Criar Game
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/games"
+  body:
+    type: json
+    data: |-
+      {
+        "slug": "pokemon-tcg",
+        "name": "Pokémon TCG",
+        "sourceApi": "pokemontcg.io"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

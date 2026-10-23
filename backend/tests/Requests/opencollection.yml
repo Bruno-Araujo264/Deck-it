@@ -1,0 +1,26 @@
+opencollection: 1.0.0
+
+info:
+  name: Deck-It API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZ2FicmllbC5zaWx2YUB0ZXN0ZS5jb20iLCJpYXQiOjE3OTI3ODM3MjMsImV4cCI6MTc5MzM4ODUyM30.sJfDRZUXyQxkIcnRUO7-s-ofjpDrLgmorE2PnHibsHI
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
