@@ -15,9 +15,9 @@ model Game {
   sourceApi Json     @map("source_api")
   createdAt DateTime @default(now()) @map("created_at")
 
-  sets      CardSet[]
-  cards     Card[]
-  trackedBy UserTrackedGame[]
+  sets        CardSet[]
+  cards       Card[]
+  trackedBy   UserTrackedGame[]
 
   @@map("games")
 }
@@ -32,16 +32,16 @@ model CardSet {
   totalCards  Int?      @map("total_cards")
   imageUrl    String?   @map("image_url") @db.Text
 
-  game Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game  Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
   cards Card[]
 
   @@unique([gameId, externalId])
   @@map("sets")
 }
 
-/// Carta individual (catálogo mestre). Campos específicos de cada jogo ficam em attributes.
+/// Carta individual (catálogo mestre). Ajustada para aceitar o ID em String (UUID) vindo do Scryfall/ETL.
 model Card {
-  id              Int      @id @default(autoincrement())
+  id              String   @id @db.VarChar(36) // UUID padrão do Scryfall (Camada Silver/Bronze)
   gameId          Int      @map("game_id")
   setId           Int      @map("set_id")
   externalId      String   @map("external_id") @db.VarChar(100)
@@ -49,7 +49,7 @@ model Card {
   collectorNumber String?  @map("collector_number") @db.VarChar(20)
   rarity          String?  @db.VarChar(50)
   imageUrl        String?  @map("image_url") @db.Text
-  attributes      Json     @default("{}") // <-- Ajustado para "{}"
+  attributes      Json     @default("{}") // Atributos específicos do jogo (ex: mana_cost, type_line, prices)
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
   game        Game             @relation(fields: [gameId], references: [id], onDelete: Cascade)
@@ -79,7 +79,7 @@ model User {
 model UserCollection {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  cardId    Int      @map("card_id")
+  cardId    String   @map("card_id") @db.VarChar(36) // Ajustado para corresponder ao ID String (UUID) de Card
   quantity  Int      @default(1)
   variant   String   @default("normal") @db.VarChar(50)
   condition String   @default("near_mint") @db.VarChar(30)
