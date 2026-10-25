@@ -1,0 +1,19 @@
+info:
+  name: Listar Cartas do Deck
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{base_url}}/decks/2/items"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

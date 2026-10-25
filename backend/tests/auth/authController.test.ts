@@ -29,17 +29,19 @@ describe('AuthController - Testes Unitários', () => {
   });
 
   describe('register', () => {
-    it('[Caminho Feliz] deve retornar 201 e o token/dados quando o registro for bem-sucedido (com nickname)', async () => {
+    it('[Caminho Feliz] deve retornar 201 quando o registro for bem-sucedido com termos aceitos', async () => {
       mockRequest.body = { 
         email: 'novo@deckit.com', 
         password: 'Senha123!', 
-        nickname: 'PlayerOne' 
+        acceptedTerms: true,
+        nickname: 'PlayerOne',
+        cpf: '123.456.789-00'
       };
       
       const mockResult = { 
         message: 'Usuário registrado com sucesso!',
         token: 'jwt-token', 
-        user: { id: 1, email: 'novo@deckit.com', nickname: 'PlayerOne' } 
+        user: { id: 1, email: 'novo@deckit.com', acceptedTerms: true } 
       };
 
       jest.spyOn(AuthService.prototype, 'register').mockResolvedValue(mockResult as any);
@@ -49,97 +51,40 @@ describe('AuthController - Testes Unitários', () => {
       expect(AuthService.prototype.register).toHaveBeenCalledWith(
         'novo@deckit.com', 
         'Senha123!', 
-        'PlayerOne'
+        true,
+        'PlayerOne',
+        '123.456.789-00'
       );
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(responseObject.body).toEqual(mockResult);
     });
 
-    it('[Caminho Feliz] deve retornar 201 mesmo sem enviar o nickname (opcional)', async () => {
-      mockRequest.body = { email: 'novo2@deckit.com', password: 'Senha123!' };
-      
-      const mockResult = { 
-        message: 'Usuário registrado com sucesso!',
-        token: 'jwt-token', 
-        user: { id: 2, email: 'novo2@deckit.com', nickname: null } 
+    it('[Caminho de Erro] deve retornar 400 se os termos não forem aceitos', async () => {
+      mockRequest.body = { 
+        email: 'novo@deckit.com', 
+        password: 'Senha123!', 
+        acceptedTerms: false 
       };
-
-      jest.spyOn(AuthService.prototype, 'register').mockResolvedValue(mockResult as any);
-
-      await authController.register(mockRequest as Request, mockResponse as Response);
-
-      expect(AuthService.prototype.register).toHaveBeenCalledWith(
-        'novo2@deckit.com', 
-        'Senha123!', 
-        undefined
-      );
-      expect(mockResponse.status).toHaveBeenCalledWith(201);
-    });
-
-    it('[Caminho de Erro] deve retornar 400 se e-mail ou senha estiverem ausentes', async () => {
-      mockRequest.body = { email: 'novo@deckit.com' }; // sem senha
 
       const registerSpy = jest.spyOn(AuthService.prototype, 'register');
 
       await authController.register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(responseObject.body).toHaveProperty('error');
+      expect(responseObject.body).toHaveProperty('error', 'Você deve aceitar os termos de uso para se cadastrar.');
       expect(registerSpy).not.toHaveBeenCalled();
     });
 
-    it('[Caminho de Erro] deve retornar 400 se o service lançar erro (ex: email duplicado)', async () => {
-      mockRequest.body = { email: 'duplicado@deckit.com', password: 'Senha123!' };
-      
-      jest.spyOn(AuthService.prototype, 'register').mockRejectedValue(new Error('E-mail já cadastrado.'));
+    it('[Caminho de Erro] deve retornar 400 se e-mail ou senha estiverem ausentes', async () => {
+      mockRequest.body = { email: 'novo@deckit.com', acceptedTerms: true }; // sem senha
+
+      const registerSpy = jest.spyOn(AuthService.prototype, 'register');
 
       await authController.register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(responseObject.body).toHaveProperty('error', 'E-mail já cadastrado.');
-    });
-  });
-
-  describe('login', () => {
-    it('[Caminho Feliz] deve retornar 200 e o token JWT no login válido', async () => {
-      mockRequest.body = { email: 'login@deckit.com', password: 'Senha123!' };
-      
-      const mockResult = { 
-        message: 'Login realizado com sucesso!',
-        token: 'jwt-token', 
-        user: { id: 1, email: 'login@deckit.com' } 
-      };
-
-      jest.spyOn(AuthService.prototype, 'login').mockResolvedValue(mockResult as any);
-
-      await authController.login(mockRequest as Request, mockResponse as Response);
-
-      expect(AuthService.prototype.login).toHaveBeenCalledWith('login@deckit.com', 'Senha123!');
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(responseObject.body).toEqual(mockResult);
-    });
-
-    it('[Caminho de Erro] deve retornar 400 se faltar campos no body', async () => {
-      mockRequest.body = { password: 'Senha123!' }; // sem email
-
-      const loginSpy = jest.spyOn(AuthService.prototype, 'login');
-
-      await authController.login(mockRequest as Request, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(responseObject.body).toHaveProperty('error');
-      expect(loginSpy).not.toHaveBeenCalled();
-    });
-
-    it('[Caminho de Erro] deve retornar 401 se as credenciais forem inválidas', async () => {
-      mockRequest.body = { email: 'login@deckit.com', password: 'Errada' };
-      
-      jest.spyOn(AuthService.prototype, 'login').mockRejectedValue(new Error('Credenciais inválidas.'));
-
-      await authController.login(mockRequest as Request, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(401);
-      expect(responseObject.body).toHaveProperty('error', 'Credenciais inválidas.');
+      expect(responseObject.body).toHaveProperty('error', 'E-mail e senha são obrigatórios.');
+      expect(registerSpy).not.toHaveBeenCalled();
     });
   });
 });

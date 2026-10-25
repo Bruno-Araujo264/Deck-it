@@ -4,7 +4,6 @@ import { AuthController } from '../controllers/authController.js';
 const router = Router();
 const authController = new AuthController();
 
-// Rotas públicas de autenticação tradicional
 router.post('/register', (req, res) => authController.register(req, res));
 router.post('/login', (req, res) => authController.login(req, res));
 

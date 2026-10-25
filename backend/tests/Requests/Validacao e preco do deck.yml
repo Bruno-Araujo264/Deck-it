@@ -1,0 +1,23 @@
+info:
+  name: Validação e Preço do Deck
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/decks/2/valuation?priceType=usd"
+  headers:
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: priceType
+      value: usd
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

@@ -1,0 +1,18 @@
+info:
+  name: Remover Carta do Deck
+  type: http
+  seq: 7
+
+http:
+  method: DELETE
+  url: "{{base_url}}/decks/1/items/5"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

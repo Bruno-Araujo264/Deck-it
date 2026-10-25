@@ -4,16 +4,19 @@ import { AuthService } from '../services/authService.js';
 const authService = new AuthService();
 
 export class AuthController {
-  // Rota de Registro
   public async register(req: Request, res: Response) {
     try {
-      const { email, password, nickname } = req.body; // <--- Extraímos o nickname do body
+      const { email, password, acceptedTerms, nickname, cpf } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
       }
 
-      const result = await authService.register(email, password, nickname); // <--- Repassamos para o service
+      if (acceptedTerms !== true) {
+        return res.status(400).json({ error: 'Você deve aceitar os termos de uso para se cadastrar.' });
+      }
+
+      const result = await authService.register(email, password, acceptedTerms, nickname, cpf);
       return res.status(201).json({
         message: 'Usuário registrado com sucesso!',
         ...result,
@@ -23,7 +26,6 @@ export class AuthController {
     }
   }
 
-  // Rota de Login
   public async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;

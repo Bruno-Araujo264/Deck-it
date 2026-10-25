@@ -11,11 +11,7 @@ http:
       value: application/json
   body:
     type: json
-    data: |-
-      {
-        "email": "gabriel.silva@teste.com",
-        "password": "senhaSuperSegura123"
-      }
+    data: '{"email": "gabriel.silva@teste.com", "password": "senhaSuperSegura123", "nickname": "GabrielSilva", "cpf": "123.456.789-00", "acceptedTerms": true}'
   auth: inherit
 
 settings:

@@ -1,0 +1,21 @@
+info:
+  name: Trocar Senha
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{base_url}}/users/change-password"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth: inherit
+  body:
+    type: json
+    data: '{"currentPassword": "senhaSuperSegura123", "newPassword": "NovaSenhaSuperForte456!"}'
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

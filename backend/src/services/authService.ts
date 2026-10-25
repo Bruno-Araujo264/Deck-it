@@ -10,7 +10,17 @@ export class AuthService {
     } as jwt.SignOptions);
   }
 
-public async register(email: string, passwordPlain: string, nickname?: string) {
+  public async register(
+    email: string, 
+    passwordPlain: string, 
+    acceptedTerms: boolean, 
+    nickname?: string, 
+    cpf?: string
+  ) {
+    if (!acceptedTerms) {
+      throw new Error('Você deve aceitar os termos de uso para se cadastrar.');
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -19,13 +29,25 @@ public async register(email: string, passwordPlain: string, nickname?: string) {
       throw new Error('E-mail já cadastrado.');
     }
 
+    if (cpf) {
+      const existingCpf = await prisma.user.findUnique({
+        where: { cpf },
+      });
+      if (existingCpf) {
+        throw new Error('Este CPF já está cadastrado em outra conta.');
+      }
+    }
+
     const passwordHash = await bcrypt.hash(passwordPlain, 10);
 
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
+        acceptedTerms: true,
+        termsAcceptedAt: new Date(),
         ...(nickname ? { nickname } : {}),
+        ...(cpf ? { cpf } : {}),
       },
     });
 
@@ -35,7 +57,10 @@ public async register(email: string, passwordPlain: string, nickname?: string) {
       user: { 
         id: user.id, 
         email: user.email, 
-        nickname: user.nickname 
+        nickname: user.nickname,
+        cpf: user.cpf,
+        acceptedTerms: user.acceptedTerms,
+        termsAcceptedAt: user.termsAcceptedAt
       },
       token,
     };
@@ -62,9 +87,11 @@ public async register(email: string, passwordPlain: string, nickname?: string) {
       user: { 
         id: user.id, 
         email: user.email, 
-        nickname: user.nickname 
+        nickname: user.nickname,
+        cpf: user.cpf,
+        acceptedTerms: user.acceptedTerms
       },
       token,
     };
   }
-  }
+}
