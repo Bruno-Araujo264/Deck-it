@@ -1,10 +1,8 @@
 import prisma from '../db/client.js';
-import { Prisma } from '../generated/prisma/client.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export class AuthService {
-  // Auxiliar privado para gerar o Token JWT
   private static generateToken(userId: number, email: string): string {
     const secret = process.env.JWT_SECRET || 'fallback_secret';
     return jwt.sign({ userId, email }, secret, {
@@ -12,8 +10,7 @@ export class AuthService {
     } as jwt.SignOptions);
   }
 
-  // Cadastro de novo usuário (Tradicional)
-  public async register(email: string, passwordPlain: string) {
+public async register(email: string, passwordPlain: string, nickname?: string) {
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -28,18 +25,22 @@ export class AuthService {
       data: {
         email,
         passwordHash,
+        ...(nickname ? { nickname } : {}),
       },
     });
 
     const token = AuthService.generateToken(user.id, user.email);
 
     return {
-      user: { id: user.id, email: user.email },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        nickname: user.nickname 
+      },
       token,
     };
   }
 
-  // Login tradicional
   public async login(email: string, passwordPlain: string) {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -58,21 +59,12 @@ export class AuthService {
     const token = AuthService.generateToken(user.id, user.email);
 
     return {
-      user: { id: user.id, email: user.email },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        nickname: user.nickname 
+      },
       token,
     };
   }
-
-  // Buscar usuário por ID (Seguindo o padrão do GameService)
-  public async getUserById(id: number) {
-    return await prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        email: true,
-        avatarUrl: true,
-        createdAt: true,
-      },
-    });
   }
-}

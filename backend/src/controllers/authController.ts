@@ -7,13 +7,13 @@ export class AuthController {
   // Rota de Registro
   public async register(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password, nickname } = req.body; // <--- Extraímos o nickname do body
 
       if (!email || !password) {
         return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
       }
 
-      const result = await authService.register(email, password);
+      const result = await authService.register(email, password, nickname); // <--- Repassamos para o service
       return res.status(201).json({
         message: 'Usuário registrado com sucesso!',
         ...result,

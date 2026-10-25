@@ -25,13 +25,45 @@ describe('AuthService - Testes Unitários Completos', () => {
   });
 
   describe('register', () => {
-    it('[Caminho Feliz] deve criar um novo usuário com sucesso e retornar o token e dados', async () => {
+    it('[Caminho Feliz] deve criar um novo usuário com sucesso (com nickname) e retornar o token e dados', async () => {
       const email = 'novo@deckit.com';
       const password = 'SenhaForte123!';
+      const nickname = 'PlayerOne';
 
       const mockCreatedUser = {
         id: 1,
         email: email,
+        nickname: nickname,
+      };
+
+      mockedPrisma.user.findUnique.mockResolvedValue(null);
+      mockedPrisma.user.create.mockResolvedValue(mockCreatedUser);
+
+      const result = await authService.register(email, password, nickname);
+
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email },
+      });
+      expect(mockedPrisma.user.create).toHaveBeenCalledTimes(1);
+      expect(mockedPrisma.user.create).toHaveBeenCalledWith({
+        data: {
+          email,
+          passwordHash: expect.any(String),
+          nickname,
+        },
+      });
+      expect(result).toHaveProperty('token');
+      expect(result.user).toEqual(mockCreatedUser);
+    });
+
+    it('[Caminho Feliz] deve criar um novo usuário com sucesso (sem nickname) tratando o opcional', async () => {
+      const email = 'novo2@deckit.com';
+      const password = 'SenhaForte123!';
+
+      const mockCreatedUser = {
+        id: 2,
+        email: email,
+        nickname: null,
       };
 
       mockedPrisma.user.findUnique.mockResolvedValue(null);
@@ -39,10 +71,13 @@ describe('AuthService - Testes Unitários Completos', () => {
 
       const result = await authService.register(email, password);
 
-      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
-        where: { email },
+      expect(mockedPrisma.user.create).toHaveBeenCalledWith({
+        data: {
+          email,
+          passwordHash: expect.any(String),
+          // Sem a propriedade nickname pois foi omitida pelo spread condicional
+        },
       });
-      expect(mockedPrisma.user.create).toHaveBeenCalledTimes(1);
       expect(result).toHaveProperty('token');
       expect(result.user).toEqual(mockCreatedUser);
     });
@@ -59,7 +94,7 @@ describe('AuthService - Testes Unitários Completos', () => {
   });
 
   describe('login', () => {
-    it('[Caminho Feliz] deve retornar um token JWT e os dados do usuário quando as credenciais forem válidas', async () => {
+    it('[Caminho Feliz] deve retornar um token JWT e os dados do usuário (incluindo nickname) quando as credenciais forem válidas', async () => {
       const email = 'login@deckit.com';
       const password = 'SenhaForte123!';
 
@@ -67,6 +102,7 @@ describe('AuthService - Testes Unitários Completos', () => {
       const mockUserFromDb = {
         id: 1,
         email: email,
+        nickname: 'MasterPlayer',
         passwordHash: hashedPassword,
       };
 
@@ -81,6 +117,7 @@ describe('AuthService - Testes Unitários Completos', () => {
       expect(result.user).toEqual({
         id: mockUserFromDb.id,
         email: mockUserFromDb.email,
+        nickname: mockUserFromDb.nickname,
       });
     });
 
@@ -101,6 +138,7 @@ describe('AuthService - Testes Unitários Completos', () => {
       const mockUserFromDb = {
         id: 1,
         email: email,
+        nickname: 'MasterPlayer',
         passwordHash: hashedPassword,
       };
 

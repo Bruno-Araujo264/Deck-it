@@ -29,22 +29,51 @@ describe('AuthController - Testes Unitários', () => {
   });
 
   describe('register', () => {
-    it('[Caminho Feliz] deve retornar 201 e o token/dados quando o registro for bem-sucedido', async () => {
-      mockRequest.body = { email: 'novo@deckit.com', password: 'Senha123!' };
+    it('[Caminho Feliz] deve retornar 201 e o token/dados quando o registro for bem-sucedido (com nickname)', async () => {
+      mockRequest.body = { 
+        email: 'novo@deckit.com', 
+        password: 'Senha123!', 
+        nickname: 'PlayerOne' 
+      };
       
       const mockResult = { 
         message: 'Usuário registrado com sucesso!',
         token: 'jwt-token', 
-        user: { id: 1, email: 'novo@deckit.com' } 
+        user: { id: 1, email: 'novo@deckit.com', nickname: 'PlayerOne' } 
       };
 
       jest.spyOn(AuthService.prototype, 'register').mockResolvedValue(mockResult as any);
 
       await authController.register(mockRequest as Request, mockResponse as Response);
 
-      expect(AuthService.prototype.register).toHaveBeenCalledWith('novo@deckit.com', 'Senha123!');
+      expect(AuthService.prototype.register).toHaveBeenCalledWith(
+        'novo@deckit.com', 
+        'Senha123!', 
+        'PlayerOne'
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(responseObject.body).toEqual(mockResult);
+    });
+
+    it('[Caminho Feliz] deve retornar 201 mesmo sem enviar o nickname (opcional)', async () => {
+      mockRequest.body = { email: 'novo2@deckit.com', password: 'Senha123!' };
+      
+      const mockResult = { 
+        message: 'Usuário registrado com sucesso!',
+        token: 'jwt-token', 
+        user: { id: 2, email: 'novo2@deckit.com', nickname: null } 
+      };
+
+      jest.spyOn(AuthService.prototype, 'register').mockResolvedValue(mockResult as any);
+
+      await authController.register(mockRequest as Request, mockResponse as Response);
+
+      expect(AuthService.prototype.register).toHaveBeenCalledWith(
+        'novo2@deckit.com', 
+        'Senha123!', 
+        undefined
+      );
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
     });
 
     it('[Caminho de Erro] deve retornar 400 se e-mail ou senha estiverem ausentes', async () => {
