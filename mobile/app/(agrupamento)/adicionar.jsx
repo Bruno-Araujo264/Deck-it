@@ -2,6 +2,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
@@ -14,6 +15,7 @@ import {
 } from 'react-native';
 
 export default function Adicionar() {
+  const { t } = useTranslation();
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -35,7 +37,7 @@ export default function Adicionar() {
   }
 
   function usePhoto() {
-    Alert.alert('Carta fotografada', 'A foto está pronta para ser adicionada ao seu deck.', [
+    Alert.alert(t('foto_capturada'), t('foto_pronta'), [
       { text: 'OK', onPress: () => setCapturedPhoto(null) },
     ]);
   }
@@ -82,7 +84,7 @@ export default function Adicionar() {
         <Pressable style={styles.backButton} onPress={() => router.back()} accessibilityRole="button">
           <Text style={styles.backIcon}>‹</Text>
         </Pressable>
-        <Text style={styles.title}>Adicionar Carta</Text>
+        <Text style={styles.title}>{t('adicionar_cartas')}</Text>
       </View>
 
       <View style={styles.cameraFrame}>
@@ -106,10 +108,10 @@ export default function Adicionar() {
         {capturedPhoto ? (
           <View style={styles.reviewActions}>
             <Pressable style={styles.secondaryButton} onPress={() => setCapturedPhoto(null)}>
-              <Text style={styles.secondaryButtonText}>Tirar outra</Text>
+              <Text style={styles.secondaryButtonText}>{t('tirar_outra_foto')}</Text>
             </Pressable>
             <Pressable style={styles.primaryButton} onPress={usePhoto}>
-              <Text style={styles.primaryButtonText}>Usar foto</Text>
+              <Text style={styles.primaryButtonText}>{t('usar_foto')}</Text>
             </Pressable>
           </View>
         ) : (

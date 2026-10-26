@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Pressable,
@@ -24,6 +25,7 @@ const cardNames = [
 ];
 
 export default function Decks() {
+  const { t } = useTranslation();
   const { source } = useLocalSearchParams();
 
   function goBack() {
@@ -51,12 +53,12 @@ export default function Decks() {
 
         <View style={styles.deckSummary}>
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>CARTAS</Text>
+            <Text style={styles.summaryLabel}>{t('cartas')}</Text>
             <Text style={styles.summaryValue}>60</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>JOGO</Text>
+            <Text style={styles.summaryLabel}>{t('jogo')}</Text>
             <Text style={styles.summaryValue}>Magic</Text>
           </View>
         </View>
@@ -65,21 +67,25 @@ export default function Decks() {
           <Text style={styles.searchIcon}>⌕</Text>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search decks or cards..."
+            placeholder={t('buscar_cartas')}
             placeholderTextColor="#8588b3"
           />
         </View>
 
         <View style={styles.cardsHeader}>
-          <Text style={styles.sectionTitle}>Cartas no Deck</Text>
+          <Text style={styles.sectionTitle}>{t('cartas_no_deck')}</Text>
           <Pressable onPress={() => router.push('/adicionar')}>
-            <Text style={styles.addCard}>＋ Adicionar Carta</Text>
+            <Text style={styles.addCard}>＋ {t('adicionar_cartas')}</Text>
           </Pressable>
         </View>
 
         <View style={styles.cardGrid}>
           {cardNames.map((name) => (
-            <Pressable key={name} style={styles.cardItem} onPress={() => router.push('/carta')}>
+            <Pressable
+              key={name}
+              style={styles.cardItem}
+              onPress={() => router.push('/carta')}
+            >
               <Image
                 source={require('../../assets/charizard.jpg')}
                 style={styles.cardImage}

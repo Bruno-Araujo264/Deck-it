@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   KeyboardAvoidingView,
@@ -13,6 +14,7 @@ import {
 } from 'react-native';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -29,7 +31,7 @@ export default function LoginScreen() {
             <View style={styles.logoCenter} />
           </View>
 
-          <Text style={styles.title}>Entrar</Text>
+          <Text style={styles.title}>Deck-it</Text>
 
           <View style={styles.form}>
             <Text style={styles.label}>EMAIL</Text>
@@ -42,7 +44,7 @@ export default function LoginScreen() {
               autoCorrect={false}
             />
 
-            <Text style={[styles.label, styles.passwordLabel]}>SENHA</Text>
+            <Text style={[styles.label, styles.passwordLabel]}>{t('senha')}</Text>
             <View style={styles.passwordInputWrap}>
               <TextInput
                 style={styles.passwordInput}
@@ -62,23 +64,23 @@ export default function LoginScreen() {
             </View>
 
             <Pressable style={styles.forgotButton}>
-              <Text style={styles.forgotText}>Esqueceu a senha?</Text>
+              <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
             <Pressable style={styles.loginButton} onPress={() => router.push('/home')}>
-              <Text style={styles.loginButtonText}>Entrar</Text>
+              <Text style={styles.loginButtonText}>{t('entrar')}</Text>
             </Pressable>
 
             <View style={styles.createAccountRow}>
-              <Text style={styles.helperText}>Não possui uma conta?</Text>
+              <Text style={styles.helperText}>{t('sem_conta')}</Text>
               <Pressable onPress={() => router.push('/cadastro')}>
-                <Text style={styles.actionText}> Crie uma!</Text>
+                <Text style={styles.actionText}> {t('criar_conta')}!</Text>
               </Pressable>
             </View>
 
             <View style={styles.dividerRow}>
               <View style={styles.divider} />
-              <Text style={styles.dividerText}>Ou Continue Com</Text>
+              <Text style={styles.dividerText}>{t('continuar_com')}</Text>
               <View style={styles.divider} />
             </View>
 

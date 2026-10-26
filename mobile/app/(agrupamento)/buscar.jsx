@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Pressable,
@@ -13,14 +14,14 @@ import {
 } from 'react-native';
 
 const allDecks = [
-  { name: 'Sliver Overlord', cards: '100 cards', image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Blue Counterspell', cards: '60 cards', image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Goblins Aggro', cards: '60 cards', image: require('../../assets/pokemon-back.jpg') },
-  { name: 'DECK SUPREMO', cards: '100 cards', image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Sliver Overlord', cards: '100 cards', image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Blue Counterspell', cards: '60 cards', image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Goblins Aggro', cards: '60 cards', image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Selesnya Lifegain', cards: '100 cards', image: require('../../assets/yugioh-back.jpg') },
+  { name: 'Sliver Overlord', cards: 100, image: require('../../assets/yugioh-back.jpg') },
+  { name: 'Blue Counterspell', cards: 60, image: require('../../assets/yugioh-back.jpg') },
+  { name: 'Goblins Aggro', cards: 60, image: require('../../assets/pokemon-back.jpg') },
+  { name: 'DECK SUPREMO', cards: 100, image: require('../../assets/pokemon-back.jpg') },
+  { name: 'Sliver Overlord', cards: 100, image: require('../../assets/yugioh-back.jpg') },
+  { name: 'Blue Counterspell', cards: 60, image: require('../../assets/pokemon-back.jpg') },
+  { name: 'Goblins Aggro', cards: 60, image: require('../../assets/pokemon-back.jpg') },
+  { name: 'Selesnya Lifegain', cards: 100, image: require('../../assets/yugioh-back.jpg') },
 ];
 
 function useDeckSearch(query) {
@@ -31,6 +32,7 @@ function useDeckSearch(query) {
 }
 
 export default function Buscar() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const decks = useDeckSearch(query);
 
@@ -49,7 +51,7 @@ export default function Buscar() {
             value={query}
             onChangeText={setQuery}
             style={styles.searchInput}
-            placeholder="Search decks or cards..."
+            placeholder={t('buscar_decks')}
             placeholderTextColor="#8588b3"
             returnKeyType="search"
           />
@@ -70,11 +72,15 @@ export default function Buscar() {
                 />
               </View>
               <Text style={styles.deckName} numberOfLines={1}>{deck.name}</Text>
-              <Text style={styles.cardCount}>{deck.cards}</Text>
+              <Text style={styles.cardCount}>
+                {deck.cards}
+                {' '}
+                {t(deck.cards === 1 ? 'carta' : 'cartas').toLowerCase()}
+              </Text>
             </Pressable>
           ))}
         </View>
-        {decks.length === 0 && <Text style={styles.emptyText}>No decks found</Text>}
+        {decks.length === 0 && <Text style={styles.emptyText}>{t('nenhum_deck_encontrado')}</Text>}
       </ScrollView>
     </SafeAreaView>
   );
