@@ -1,6 +1,10 @@
 import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/client.js";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-export default new PrismaClient({ adapter });
+// Inicializa o adapter do MySQL/MariaDB passando a string de conexão do .env
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
+
+export const prisma = new PrismaClient({ adapter });
+
+export default prisma;

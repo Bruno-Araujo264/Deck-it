@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { GameController } from '../controller/gameController.js'; // Ajuste o caminho se necessário
+import { GameController } from '../controllers/gameController.js'; // Ajuste o caminho se necessário
 
 const router = Router();
 const gameController = new GameController();

@@ -1,0 +1,22 @@
+info:
+  name: Adicionar Carta ao Deck
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{base_url}}/decks/2/items"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: '{"cardExternalId": "0000419b-0bba-4488-8f7a-6194544ce91e", "quantity": 4, "variant": "normal", "condition": "near_mint"}'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

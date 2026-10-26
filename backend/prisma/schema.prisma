@@ -1,10 +1,11 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
 }
 
 /// Um jogo (Pokémon, Magic, Lorcana...)
@@ -12,82 +13,101 @@ model Game {
   id        Int      @id @default(autoincrement())
   slug      String   @unique @db.VarChar(50)
   name      String   @db.VarChar(100)
-  sourceApi String[] @map("source_api")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  sourceApi Json     @map("source_api")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  sets      CardSet[]
-  cards     Card[]
+  decks     UserDeck[]
   trackedBy UserTrackedGame[]
 
   @@map("games")
 }
-/// Uma coleção/expansão dentro de um jogo
-model CardSet {
-  id          Int       @id @default(autoincrement())
-  gameId      Int       @map("game_id")
-  externalId  String    @map("external_id") @db.VarChar(100)
-  name        String    @db.VarChar(150)
-  releaseDate DateTime? @map("release_date") @db.Date
-  totalCards  Int?      @map("total_cards")
-  imageUrl    String?   @map("image_url")
-
-  game  Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  cards Card[]
-
-  @@unique([gameId, externalId])
-  @@map("sets")
-}
-
-/// Carta individual (catálogo mestre). Campos específicos de cada jogo ficam em attributes.
-model Card {
-  id              Int      @id @default(autoincrement())
-  gameId          Int      @map("game_id")
-  setId           Int      @map("set_id")
-  externalId      String   @map("external_id") @db.VarChar(100)
-  name            String   @db.VarChar(200)
-  collectorNumber String?  @map("collector_number") @db.VarChar(20)
-  rarity          String?  @db.VarChar(50)
-  imageUrl        String?  @map("image_url")
-  attributes      Json     @default("{}")
-  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  game        Game             @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  set         CardSet          @relation(fields: [setId], references: [id], onDelete: Cascade)
-  collections UserCollection[]
-
-  @@unique([gameId, externalId])
-  @@index([setId])
-  @@map("cards")
-}
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique @db.VarChar(255)
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String?   @map("password_hash") @db.VarChar(255)
+  nickname        String?   @db.VarChar(50) // <--- Adicionado (opcional ou obrigatório, você decide)
+  cpf             String?   @unique @db.VarChar(14) // <--- Adicionado (único, se aplicável)
+  avatarUrl       String?   @map("avatar_url") @db.VarChar(500)
+  
+  acceptedTerms   Boolean   @default(false) @map("accepted_terms")
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
 
-  collection   UserCollection[]
-  trackedGames UserTrackedGame[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  decks           UserDeck[]
+  trackedGames    UserTrackedGame[]
 
   @@map("users")
 }
 
-/// O "checkbox": a existência de uma linha aqui significa que o usuário possui a carta.
-model UserCollection {
+/// Um Deck ou Pasta nomeada do usuário para um jogo específico
+model UserDeck {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  cardId    Int      @map("card_id")
-  quantity  Int      @default(1)
-  variant   String   @default("normal") @db.VarChar(50)
-  condition String   @default("near_mint") @db.VarChar(30)
-  addedAt   DateTime @default(now()) @map("added_at") @db.Timestamptz(6)
+  gameId    Int      @map("game_id")
+  name      String   @db.VarChar(100) // Ex: "Deck Competitivo Pauper", "Para Troca"
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game  Game           @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  items UserDeckItem[]
 
-  @@unique([userId, cardId, variant])
   @@index([userId])
-  @@map("user_collection")
+  @@index([gameId])
+  @@map("user_decks")
+}
+
+/// As cartas contidas dentro de um deck específico
+model UserDeckItem {
+  id             Int      @id @default(autoincrement())
+  deckId         Int      @map("deck_id")
+  cardExternalId String   @map("card_external_id") @db.VarChar(64)
+  quantity       Int      @default(1)
+  variant        String   @default("normal") @db.VarChar(50)
+  condition      String   @default("near_mint") @db.VarChar(30)
+  addedAt        DateTime @default(now()) @map("added_at")
+
+  deck UserDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  // Garante que dentro do mesmo deck não repita a mesma carta com a mesma variante (só incrementa a quantity)
+  @@unique([deckId, cardExternalId, variant])
+  @@index([deckId])
+  @@map("user_deck_items")
+}
+
+view Card {
+  gameId          Int      @map("game_id")
+  externalId      String   @map("external_id") @db.VarChar(64)
+  name            String   @db.VarChar(500)
+  lang            String?  @db.VarChar(8)
+  releasedAt      DateTime? @map("released_at") @db.Date
+  rarity          String?  @db.VarChar(16)
+  setCode         String?  @map("set_code") @db.VarChar(16)
+  setName         String?  @map("set_name") @db.VarChar(255)
+  collectorNumber String?  @map("collector_number") @db.VarChar(32)
+  cardType        String?  @map("card_type") @db.VarChar(255)
+  cardText        String?  @map("card_text") @db.Text
+  imageSmall      String?  @map("image_small") @db.VarChar(500)
+  imageNormal     String?  @map("image_normal") @db.VarChar(500)
+  imageLarge      String?  @map("image_large") @db.VarChar(500)
+  faces           Json?
+  attributes      Json?
+  updatedAt       DateTime @map("updated_at")
+
+  @@map("cards")
+}
+
+view CardPrice {
+  gameId     Int      @map("game_id")
+  externalId String   @map("external_id") @db.VarChar(64)
+  priceDate  DateTime @map("price_date") @db.Date
+  priceType  String   @map("price_type") @db.VarChar(16)
+  price      Decimal  @db.Decimal(10, 2)
+
+  @@map("card_prices")
 }
 
 /// Jogos que o usuário escolheu acompanhar

@@ -1,0 +1,22 @@
+info:
+  name: Atualizar Jogo
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{base_url}}/games/1"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Pokémon Trading Card Game",
+        "sourceApi": "official-api"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
