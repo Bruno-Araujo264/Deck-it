@@ -5,7 +5,7 @@ import { getLocales } from 'expo-localization';
 import en from './idiomas/en.json';
 import pt from './idiomas/pt.json';
 
-const supportedLanguages = ['pt', 'en'];
+export const supportedLanguages = ['pt', 'en'];
 
 const deviceLanguage = getLocales()?.[0]?.languageCode || 'en';
 

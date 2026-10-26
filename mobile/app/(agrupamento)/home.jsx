@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import {
 	FlatList,
 	Pressable,
@@ -17,12 +18,14 @@ const categories = [
 ];
 
 const decks = [
-	{ game: 'Magic', name: 'Commander Red Burn', cards: '100 Cards', age: '2h ago' },
-	{ game: 'Pokémon', name: 'Charizard Ex Deck', cards: '60 Cards', age: '1d ago' },
-	{ game: 'Yu-Gi-Oh', name: 'Blue-Eyes Dragon', cards: '40 Cards', age: '3d ago' },
+	{ game: 'Magic', name: 'Commander Red Burn', cards: 100, age: '2h ago' },
+	{ game: 'Pokémon', name: 'Charizard Ex Deck', cards: 60, age: '1d ago' },
+	{ game: 'Yu-Gi-Oh', name: 'Blue-Eyes Dragon', cards: 40, age: '3d ago' },
 ];
 
 export default function HomeScreen() {
+	const { t } = useTranslation();
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
 			<StatusBar style="light" />
@@ -38,7 +41,6 @@ export default function HomeScreen() {
 							<Text style={styles.title}>Deck-It</Text>
 						</View>
 
-						<Text style={styles.sectionTitle}>Game Categories</Text>
 						<FlatList
 							horizontal
 							data={categories}
@@ -52,7 +54,7 @@ export default function HomeScreen() {
 								</Pressable>
 							)}
 						/>
-						<Text style={[styles.sectionTitle, styles.recentTitle]}>Recent Decks</Text>
+						<Text style={[styles.sectionTitle, styles.recentTitle]}>{t('decks_recentes')}</Text>
 					</>
 				}
 				renderItem={({ item }) => (
@@ -63,7 +65,11 @@ export default function HomeScreen() {
 						<View style={styles.deckInfo}>
 							<Text style={styles.game}>{item.game}</Text>
 							<Text style={styles.deckName}>{item.name}</Text>
-							<Text style={styles.cardCount}>{item.cards}</Text>
+							<Text style={styles.cardCount}>
+								{item.cards}
+								{' '}
+								{t(item.cards === 1 ? 'carta' : 'cartas').toLowerCase()}
+							</Text>
 						</View>
 						<Text style={styles.age}>{item.age}</Text>
 					</Pressable>
@@ -86,7 +92,7 @@ const styles = StyleSheet.create({
 		borderColor: '#3767d9',
 		borderStyle: 'dotted',
 	},
-	title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
+	title: { color: '#f4f4fb', fontSize: 18, fontWeight: '800' },
 	searchBox: {
 		height: 33,
 		marginHorizontal: 14,
@@ -101,7 +107,7 @@ const styles = StyleSheet.create({
 	searchIcon: { color: '#a2a5cf', fontSize: 22, marginRight: 5 },
 	searchInput: { flex: 1, color: '#f4f4fb', fontSize: 11, padding: 0 },
 	sectionTitle: { color: '#f4f4fb', fontSize: 11, fontWeight: '800', marginHorizontal: 14 },
-	categoryList: { paddingHorizontal: 14, gap: 7, marginTop: 8 },
+	categoryList: { paddingHorizontal: 14, gap: 10, marginTop: 15 },
 	category: {
 		height: 24,
 		paddingHorizontal: 10,

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   KeyboardAvoidingView,
@@ -13,6 +14,7 @@ import {
 } from 'react-native';
 
 export default function Cadastro() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -32,7 +34,7 @@ export default function Cadastro() {
           <Text style={styles.title}>Cadastrar</Text>
 
           <View style={styles.form}>
-            <Text style={styles.label}>Nome</Text>
+            <Text style={styles.label}>{t('nome')}</Text>
             <TextInput
               style={styles.input}
               placeholder="Bruno Mars"
@@ -40,8 +42,7 @@ export default function Cadastro() {
               autoCapitalize="none"
               autoCorrect={false}
             />
-
-            <Text style={styles.label}>EMAIL</Text>
+            <Text style={styles.label}>{t('email')}</Text>
             <TextInput
               style={styles.input}
               placeholder="hello@design.co"
@@ -51,7 +52,7 @@ export default function Cadastro() {
               autoCorrect={false}
             />
 
-            <Text style={[styles.label, styles.passwordLabel]}>SENHA</Text>
+            <Text style={[styles.label, styles.passwordLabel]}>{t('senha')}</Text>
             <View style={styles.passwordInputWrap}>
               <TextInput
                 style={styles.passwordInput}
@@ -71,23 +72,23 @@ export default function Cadastro() {
             </View>
 
             <Pressable style={styles.forgotButton}>
-              <Text style={styles.forgotText}>Esqueceu a senha?</Text>
+              <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
             <Pressable style={styles.loginButton}>
-              <Text style={styles.loginButtonText}>Entrar</Text>
+              <Text style={styles.loginButtonText}>{t('entrar')}</Text>
             </Pressable>
 
             <View style={styles.createAccountRow}>
-              <Text style={styles.helperText}>Já possui uma conta?</Text>
+              <Text style={styles.helperText}>{t('com_conta')}</Text>
               <Pressable onPress={() => router.push('/login')}>
-                <Text style={styles.actionText}> Faça login!</Text>
+                <Text style={styles.actionText}> {t('entrar')}!</Text>
               </Pressable>
             </View>
 
             <View style={styles.dividerRow}>
               <View style={styles.divider} />
-              <Text style={styles.dividerText}>Ou Continue Com</Text>
+              <Text style={styles.dividerText}>{t('continuar_com')}</Text>
               <View style={styles.divider} />
             </View>
 
