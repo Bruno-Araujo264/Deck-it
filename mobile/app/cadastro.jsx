@@ -1,87 +1,68 @@
-import { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import { Button, Field, Logo, Screen } from '../components';
+import { colors, fonts, spacing, type } from '../theme';
 
 export default function Cadastro() {
   const { t } = useTranslation();
-  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
+    <Screen edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.content}>
-          <View style={styles.logo} accessibilityLabel="Deck-it">
-            <View style={[styles.logoWing, styles.logoWingLeft]} />
-            <View style={[styles.logoWing, styles.logoWingRight]} />
-            <View style={styles.logoCenter} />
-          </View>
-
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Logo size={72} withWordmark stacked wordmarkSize={24} style={styles.brand} />
           <Text style={styles.title}>Cadastrar</Text>
 
           <View style={styles.form}>
-            <Text style={styles.label}>{t('nome')}</Text>
-            <TextInput
-              style={styles.input}
+            <Field
+              label={t('nome')}
               placeholder="Bruno Mars"
-              placeholderTextColor="#8284a7"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <Text style={styles.label}>{t('email')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="hello@design.co"
-              placeholderTextColor="#8284a7"
-              keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
 
-            <Text style={[styles.label, styles.passwordLabel]}>{t('senha')}</Text>
-            <View style={styles.passwordInputWrap}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="••••••••••••"
-                placeholderTextColor="#8284a7"
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-              />
-              <Pressable
-                style={styles.eyeButton}
-                onPress={() => setShowPassword((visible) => !visible)}
-                accessibilityRole="button"
-                accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                <Text style={styles.eye}>{showPassword ? '◉' : '◌'}</Text>
-              </Pressable>
-            </View>
+            <Field
+              label={t('email')}
+              placeholder="hello@design.co"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              containerStyle={styles.spaced}
+            />
+
+            <Field
+              label={t('senha')}
+              placeholder="••••••••••••"
+              secure
+              autoCapitalize="none"
+              containerStyle={styles.spaced}
+            />
 
             <Pressable style={styles.forgotButton}>
               <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
-            <Pressable style={styles.loginButton}>
-              <Text style={styles.loginButtonText}>{t('entrar')}</Text>
-            </Pressable>
+            <Button label={t('entrar')} />
 
             <View style={styles.createAccountRow}>
               <Text style={styles.helperText}>{t('com_conta')}</Text>
-              <Pressable onPress={() => router.push('/login')}>
+              <Pressable onPress={() => router.push('/login')} hitSlop={6}>
                 <Text style={styles.actionText}> {t('entrar')}!</Text>
               </Pressable>
             </View>
@@ -93,198 +74,51 @@ export default function Cadastro() {
             </View>
 
             <View style={styles.socialRow}>
-              <Pressable style={styles.socialButton}>
-                <Text style={styles.socialIcon}>⊗</Text>
-                <Text style={styles.socialText}>Google</Text>
-              </Pressable>
-              <Pressable style={styles.socialButton}>
-                <Text style={styles.socialIcon}>♡</Text>
-                <Text style={styles.socialText}>Apple</Text>
-              </Pressable>
+              <Button label="Google" icon="⊗" variant="secondary" size="sm" style={styles.social} />
+              <Button label="Apple" icon="♡" variant="secondary" size="sm" style={styles.social} />
             </View>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#101126',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#101126',
-    alignItems: 'center',
-  },
+  container: { flex: 1 },
   content: {
-    width: '100%',
-    maxWidth: 420,
-    paddingHorizontal: 22,
-    paddingTop: 22,
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
-  logo: {
-    width: 112,
-    height: 70,
-    alignSelf: 'center',
-    position: 'relative',
-    marginBottom: 8,
-  },
-  logoWing: {
-    position: 'absolute',
-    top: 5,
-    width: 43,
-    height: 57,
-    backgroundColor: '#d4d4d4',
-    borderWidth: 4,
-    borderColor: '#050509',
-  },
-  logoWingLeft: {
-    left: 4,
-    borderRadius: 19,
-    transform: [{ rotate: '-25deg' }],
-  },
-  logoWingRight: {
-    right: 4,
-    borderRadius: 19,
-    transform: [{ rotate: '25deg' }],
-  },
-  logoCenter: {
-    position: 'absolute',
-    left: 30,
-    top: 0,
-    width: 52,
-    height: 67,
-    borderRadius: 20,
-    backgroundColor: '#d4d4d4',
-    borderWidth: 4,
-    borderColor: '#050509',
-  },
+  brand: { marginBottom: spacing.sm },
   title: {
-    color: '#ffffff',
-    fontSize: 21,
-    fontWeight: '800',
+    ...type.headlineMd,
+    color: colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 36,
+    marginBottom: spacing.lg,
   },
-  form: {
-    width: '100%',
-  },
-  label: {
-    color: '#ffffff',
-    fontSize: 9,
-    fontWeight: '700',
-    marginTop: 16,
-    marginBottom: 6,
-  },
-  passwordLabel: {
-    marginTop: 16,
-  },
-  input: {
-    height: 37,
-    borderRadius: 22,
-    backgroundColor: '#292d62',
-    paddingHorizontal: 16,
-    color: '#ffffff',
-    fontSize: 11,
-  },
-  passwordInputWrap: {
-    height: 37,
-    borderRadius: 22,
-    backgroundColor: '#292d62',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  passwordInput: {
-    flex: 1,
-    height: '100%',
-    paddingHorizontal: 16,
-    color: '#ffffff',
-    fontSize: 12,
-  },
-  eyeButton: {
-    width: 42,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  eye: {
-    color: '#8588b3',
-    fontSize: 18,
-  },
-  forgotButton: {
-    alignSelf: 'flex-end',
-    paddingVertical: 14,
-  },
-  forgotText: {
-    color: '#686bff',
-    fontSize: 10,
-  },
-  loginButton: {
-    height: 41,
-    borderRadius: 24,
-    backgroundColor: '#625ff0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 25,
-  },
-  loginButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
+  form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
+  spaced: { marginTop: spacing.md },
+  forgotButton: { alignSelf: 'flex-end', paddingVertical: spacing.sm },
+  forgotText: { ...type.bodySm, color: colors.gold },
   createAccountRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 17,
+    marginTop: spacing.md,
   },
-  helperText: {
-    color: '#ddddE5',
-    fontSize: 10,
-  },
-  actionText: {
-    color: '#686bff',
-    fontSize: 10,
-  },
+  helperText: { ...type.bodySm, color: colors.textSecondary },
+  actionText: { ...type.bodySm, fontFamily: fonts.bodyBold, color: colors.gold },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 28,
+    gap: spacing.sm,
+    marginTop: spacing.lg,
   },
-  divider: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e1e1e4',
-  },
-  dividerText: {
-    color: '#ffffff',
-    fontSize: 9,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 17,
-  },
-  socialButton: {
-    flex: 1,
-    height: 37,
-    borderRadius: 20,
-    backgroundColor: '#292d62',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 9,
-  },
-  socialIcon: {
-    color: '#ffffff',
-    fontSize: 18,
-  },
-  socialText: {
-    color: '#ffffff',
-    fontSize: 11,
-  },
+  divider: { flex: 1, height: 1, backgroundColor: colors.border },
+  dividerText: { ...type.labelSm, color: colors.textMuted },
+  socialRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  social: { flex: 1 },
 });

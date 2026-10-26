@@ -1,18 +1,11 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Image,
-  Linking,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppHeader, Button, Logo, Screen } from '../../components';
+import { colors, gradients, radii, shadows, spacing, type } from '../../theme';
 
 export default function Adicionar() {
   const { t } = useTranslation();
@@ -59,33 +52,32 @@ export default function Adicionar() {
   }
 
   if (!permission) {
-    return <View style={styles.loading} />;
+    return <Screen stardust={false} />;
   }
 
   if (!permission.granted) {
     return (
-      <SafeAreaView style={styles.permissionScreen}>
-        <StatusBar style="light" />
-        <Text style={styles.permissionTitle}>Acesso à câmera</Text>
-        <Text style={styles.permissionText}>
-          O Deck-it precisa da câmera para fotografar suas cartas.
-        </Text>
-        <Pressable style={styles.permissionButton} onPress={handlePermissionPress}>
-          <Text style={styles.permissionButtonText}>Permitir câmera</Text>
-        </Pressable>
-      </SafeAreaView>
+      <Screen>
+        <View style={styles.permissionScreen}>
+          <Logo size={72} withWordmark stacked wordmarkSize={24} style={styles.permissionBrand} />
+          <Text style={styles.permissionTitle}>Acesso à câmera</Text>
+          <Text style={styles.permissionText}>
+            O Deck-it precisa da câmera para fotografar suas cartas.
+          </Text>
+          <Button
+            label="Permitir câmera"
+            icon="◎"
+            onPress={handlePermissionPress}
+            style={styles.permissionButton}
+          />
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <StatusBar style="light" />
-      <View style={styles.topBar}>
-        <Pressable style={styles.backButton} onPress={() => router.back()} accessibilityRole="button">
-          <Text style={styles.backIcon}>‹</Text>
-        </Pressable>
-        <Text style={styles.title}>{t('adicionar_cartas')}</Text>
-      </View>
+    <Screen stardust={false}>
+      <AppHeader variant="page" title={t('adicionar_cartas')} onBack={() => router.back()} />
 
       <View style={styles.cameraFrame}>
         {capturedPhoto ? (
@@ -103,16 +95,36 @@ export default function Adicionar() {
             }}
           />
         )}
-        <View pointerEvents="none" style={styles.cardGuide} />
+
+        {/* Retícula do scanner: cantos em Ciano Laser, conforme o guia. */}
+        <View pointerEvents="none" style={styles.cardGuide}>
+          <View style={[styles.corner, styles.cornerTopLeft]} />
+          <View style={[styles.corner, styles.cornerTopRight]} />
+          <View style={[styles.corner, styles.cornerBottomLeft]} />
+          <View style={[styles.corner, styles.cornerBottomRight]} />
+          <LinearGradient
+            colors={gradients.scanLine}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.scanLine}
+          />
+        </View>
 
         {capturedPhoto ? (
           <View style={styles.reviewActions}>
-            <Pressable style={styles.secondaryButton} onPress={() => setCapturedPhoto(null)}>
-              <Text style={styles.secondaryButtonText}>{t('tirar_outra_foto')}</Text>
-            </Pressable>
-            <Pressable style={styles.primaryButton} onPress={usePhoto}>
-              <Text style={styles.primaryButtonText}>{t('usar_foto')}</Text>
-            </Pressable>
+            <Button
+              label={t('tirar_outra_foto')}
+              variant="secondary"
+              size="sm"
+              onPress={() => setCapturedPhoto(null)}
+              style={styles.reviewButton}
+            />
+            <Button
+              label={t('usar_foto')}
+              size="sm"
+              onPress={usePhoto}
+              style={styles.reviewButton}
+            />
           </View>
         ) : (
           <View style={styles.cameraControls}>
@@ -127,121 +139,134 @@ export default function Adicionar() {
           </View>
         )}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
+const CORNER = 26;
+
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#101126' },
-  loading: { flex: 1, backgroundColor: '#101126' },
-  topBar: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#292d62',
-  },
-  backButton: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#292d62',
-    marginRight: 9,
-  },
-  backIcon: { color: '#d7d8ea', fontSize: 22, lineHeight: 19, marginTop: -2 },
-  title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
   cameraFrame: {
     flex: 1,
-    margin: 16,
-    marginBottom: 0,
+    margin: spacing.md,
+    borderRadius: radii.lg,
     overflow: 'hidden',
-    backgroundColor: '#202020',
+    backgroundColor: colors.bgDeepest,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.card,
   },
   preview: { flex: 1, width: '100%' },
+
   cardGuide: {
     position: 'absolute',
-    width: '64%',
-    height: '72%',
-    left: '18%',
-    top: '14%',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.55)',
-    borderRadius: 8,
+    width: '66%',
+    height: '62%',
+    left: '17%',
+    top: '12%',
   },
+  corner: {
+    position: 'absolute',
+    width: CORNER,
+    height: CORNER,
+    borderColor: colors.scannerCyan,
+  },
+  cornerTopLeft: {
+    top: 0,
+    left: 0,
+    borderTopWidth: 3,
+    borderLeftWidth: 3,
+    borderTopLeftRadius: radii.sm,
+  },
+  cornerTopRight: {
+    top: 0,
+    right: 0,
+    borderTopWidth: 3,
+    borderRightWidth: 3,
+    borderTopRightRadius: radii.sm,
+  },
+  cornerBottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: 3,
+    borderLeftWidth: 3,
+    borderBottomLeftRadius: radii.sm,
+  },
+  cornerBottomRight: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
+    borderBottomRightRadius: radii.sm,
+  },
+  /** Linha de varredura — o feixe horizontal do guia de estilo. */
+  scanLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: '50%',
+    height: 2,
+    shadowColor: colors.scannerCyan,
+    shadowOpacity: 0.9,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+  },
+
   cameraControls: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 20,
-    height: 64,
+    bottom: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
   },
   shutterButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#f0f0f2',
+    width: 68,
+    height: 68,
+    borderRadius: radii.pill,
+    backgroundColor: colors.gold,
     borderWidth: 3,
-    borderColor: '#050509',
+    borderColor: colors.goldLight,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.gold,
   },
-  shutterInner: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#f0f0f2' },
+  shutterInner: {
+    width: 50,
+    height: 50,
+    borderRadius: radii.pill,
+    backgroundColor: colors.goldLight,
+    opacity: 0.6,
+  },
   shutterPressed: { transform: [{ scale: 0.92 }] },
+
   reviewActions: {
     position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 20,
-    height: 42,
+    left: spacing.sm,
+    right: spacing.sm,
+    bottom: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    backgroundColor: 'transparent',
+    gap: spacing.xs,
   },
-  primaryButton: {
-    flex: 1,
-    height: 42,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#5c65c8',
-  },
-  secondaryButton: {
-    flex: 1,
-    height: 42,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#5c65c8',
-    backgroundColor: 'transparent',
-  },
-  primaryButtonText: { color: '#fff', fontSize: 12, fontWeight: '700' },
-  secondaryButtonText: { color: '#d7d8ea', fontSize: 12, fontWeight: '700' },
+  reviewButton: { flex: 1 },
+
   permissionScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    backgroundColor: '#101126',
+    paddingHorizontal: spacing.xl,
   },
-  permissionTitle: { color: '#f4f4fb', fontSize: 20, fontWeight: '800', marginBottom: 10 },
-  permissionText: { color: '#a2a5cf', fontSize: 13, textAlign: 'center', lineHeight: 20 },
-  permissionButton: {
-    marginTop: 22,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 7,
-    backgroundColor: '#5c65c8',
+  permissionBrand: { marginBottom: spacing.lg },
+  permissionTitle: {
+    ...type.headlineMd,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
-  permissionButtonText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  permissionText: {
+    ...type.bodyMd,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  permissionButton: { marginTop: spacing.lg, minWidth: 220 },
 });

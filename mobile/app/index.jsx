@@ -1,118 +1,50 @@
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Button, Logo, Screen } from '../components';
+import { colors, spacing, type } from '../theme';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
+    <Screen edges={['top', 'bottom']}>
       <View style={styles.container}>
         <View style={styles.brandArea}>
-          <View style={styles.logo} accessibilityLabel="Deck-it">
-            <View style={[styles.logoWing, styles.logoWingLeft]} />
-            <View style={[styles.logoWing, styles.logoWingRight]} />
-            <View style={styles.logoCenter} />
-          </View>
-          <Text style={styles.brandName}>Deck-It</Text>
+          <Logo size={128} withWordmark stacked wordmarkSize={38} tagline="Mesa Encantada TCG" />
         </View>
 
-        <Pressable
-          style={({ pressed }) => [styles.enterButton, pressed && styles.enterButtonPressed]}
+        <Button
+          label={t('bem_vindo')}
           onPress={() => router.push('/login')}
-          accessibilityRole="button"
-        >
-          <Text style={styles.enterText}>{t('bem_vindo')}</Text>
-        </Pressable>
+          style={styles.enterButton}
+          textStyle={styles.enterText}
+        />
 
         <Text style={styles.copyright}>© - Direitos Autorais Absolum Idum Opus</Text>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#101126',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#101126',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  brandArea: {
-    alignItems: 'center',
-    marginTop: 126,
-  },
-  logo: {
-    width: 178,
-    height: 116,
-    position: 'relative',
-  },
-  logoWing: {
-    position: 'absolute',
-    top: 10,
-    width: 69,
-    height: 96,
-    backgroundColor: '#d9d9d9',
-    borderWidth: 4,
-    borderColor: '#050509',
-  },
-  logoWingLeft: {
-    left: 5,
-    borderRadius: 25,
-    transform: [{ rotate: '-25deg' }],
-  },
-  logoWingRight: {
-    right: 5,
-    borderRadius: 25,
-    transform: [{ rotate: '25deg' }],
-  },
-  logoCenter: {
-    position: 'absolute',
-    left: 51,
-    top: 0,
-    width: 76,
-    height: 111,
-    borderRadius: 25,
-    backgroundColor: '#d9d9d9',
-    borderWidth: 4,
-    borderColor: '#050509',
-  },
-  brandName: {
-    color: '#eeeeF4',
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 15,
-  },
-  enterButton: {
-    minWidth: 150,
-    height: 60,
-    borderRadius: 16,
-    backgroundColor: '#292d62',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 191,
-    borderWidth: 1,
-    borderColor: '#343875',
+    paddingHorizontal: spacing.lg,
   },
-  enterButtonPressed: {
-    backgroundColor: '#363b79',
+  brandArea: { alignItems: 'center' },
+  enterButton: {
+    minWidth: 200,
+    height: 56,
+    marginTop: spacing.xxl * 2,
   },
-  enterText: {
-    color: '#eeeeF4',
-    fontSize: 28,
-    fontWeight: '700',
-  },
+  enterText: { ...type.titleLg, color: colors.textOnLight },
   copyright: {
-    color: '#8588b3',
-    fontSize: 8,
+    ...type.labelSm,
+    color: colors.textMuted,
     position: 'absolute',
-    bottom: 15,
+    bottom: spacing.md,
   },
 });
