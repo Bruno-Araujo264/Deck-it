@@ -12,10 +12,47 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { register } from '../api/client';
 
 export default function Cadastro() {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleRegister() {
+    setError('');
+
+    if (!nickname.trim() || !email.trim() || !password) {
+      setError('Preencha nome, e-mail e senha.');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError('Aceite os termos de uso para continuar.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await register({
+        nickname: nickname.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        acceptedTerms,
+      });
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,6 +74,8 @@ export default function Cadastro() {
             <Text style={styles.label}>{t('nome')}</Text>
             <TextInput
               style={styles.input}
+              value={nickname}
+              onChangeText={setNickname}
               placeholder="Bruno Mars"
               placeholderTextColor="#8284a7"
               autoCapitalize="none"
@@ -45,6 +84,8 @@ export default function Cadastro() {
             <Text style={styles.label}>{t('email')}</Text>
             <TextInput
               style={styles.input}
+              value={email}
+              onChangeText={setEmail}
               placeholder="hello@design.co"
               placeholderTextColor="#8284a7"
               keyboardType="email-address"
@@ -56,6 +97,8 @@ export default function Cadastro() {
             <View style={styles.passwordInputWrap}>
               <TextInput
                 style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
                 placeholder="••••••••••••"
                 placeholderTextColor="#8284a7"
                 secureTextEntry={!showPassword}
@@ -71,12 +114,28 @@ export default function Cadastro() {
               </Pressable>
             </View>
 
-            <Pressable style={styles.forgotButton}>
-              <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
+            <Pressable
+              style={styles.termsRow}
+              onPress={() => setAcceptedTerms((accepted) => !accepted)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: acceptedTerms }}
+            >
+              <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+                {acceptedTerms ? <Text style={styles.checkmark}>✓</Text> : null}
+              </View>
+              <Text style={styles.termsText}>Aceito os termos de uso.</Text>
             </Pressable>
 
-            <Pressable style={styles.loginButton}>
-              <Text style={styles.loginButtonText}>{t('entrar')}</Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <Pressable
+              style={[styles.loginButton, isLoading && styles.disabledButton]}
+              onPress={handleRegister}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Cadastrando...' : t('cadastrar')}
+              </Text>
             </Pressable>
 
             <View style={styles.createAccountRow}>
@@ -234,6 +293,44 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  errorText: {
+    color: '#ff8f9c',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    paddingVertical: 4,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#8588b3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  checkboxChecked: {
+    backgroundColor: '#625ff0',
+    borderColor: '#625ff0',
+  },
+  checkmark: {
+    color: '#ffffff',
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  termsText: {
+    color: '#ddddE5',
+    fontSize: 10,
   },
   createAccountRow: {
     flexDirection: 'row',

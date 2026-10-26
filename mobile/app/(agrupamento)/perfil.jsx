@@ -1,14 +1,15 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import i18n, { supportedLanguages } from '../../i18n';
+import { getProfile } from '../../api/client';
 
 const profileRows = [
-  { id: 'name', icon: '♙', labelKey: 'nome_completo', value: 'Bruno Mars' },
-  { id: 'email', icon: '✉', labelKey: 'email', value: 'bruno.mars@deckit.com' },
+  { id: 'name', icon: '♙', labelKey: 'nome_completo' },
+  { id: 'email', icon: '✉', labelKey: 'email' },
   { id: 'password', icon: '▣', labelKey: 'alterar_senha', valueKey: 'senha_atualizada' },
 ];
 
@@ -16,10 +17,42 @@ export default function Perfil() {
   const { t } = useTranslation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [editingField, setEditingField] = useState(null);
-  const [name, setName] = useState('Bruno Mars');
-  const [email, setEmail] = useState('bruno.mars@deckit.com');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [profileError, setProfileError] = useState('');
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const nameInputRef = useRef(null);
   const emailInputRef = useRef(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProfile() {
+      try {
+        const profile = await getProfile();
+        if (!isMounted) {
+          return;
+        }
+
+        setName(profile.nickname ?? '');
+        setEmail(profile.email ?? '');
+      } catch (error) {
+        if (isMounted) {
+          setProfileError(error.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingProfile(false);
+        }
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function showAccountAlert(title, message) {
     Alert.alert(title, message, [{ text: 'OK' }]);
@@ -63,14 +96,22 @@ export default function Perfil() {
 
         <View style={styles.profileSummary}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>BM</Text>
+            <Text style={styles.avatarText}>{getInitials(name)}</Text>
             <View style={styles.cameraBadge}>
               <Text style={styles.cameraIcon}>●</Text>
             </View>
           </View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.email}>{email}</Text>
+          {isLoadingProfile ? (
+            <Text style={styles.loadingText}>Carregando perfil...</Text>
+          ) : (
+            <>
+              <Text style={styles.name}>{name || 'Usuário'}</Text>
+              <Text style={styles.email}>{email}</Text>
+            </>
+          )}
         </View>
+
+        {profileError ? <Text style={styles.errorText}>{profileError}</Text> : null}
 
         <Text style={styles.sectionLabel}>{t('dados_pessoais')}</Text>
         <View style={styles.group}>
@@ -166,6 +207,19 @@ export default function Perfil() {
   );
 }
 
+function getInitials(name) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
+  return initials || 'U';
+}
+
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#101126' },
   screen: { flex: 1, backgroundColor: '#101126' },
@@ -190,6 +244,8 @@ const styles = StyleSheet.create({
   cameraIcon: { color: '#ffffff', fontSize: 11 },
   name: { color: '#f4f4fb', fontSize: 19, fontWeight: '800', marginTop: 10 },
   email: { color: '#8588b3', fontSize: 11, marginTop: 3 },
+  loadingText: { color: '#8588b3', fontSize: 11, marginTop: 10 },
+  errorText: { color: '#ff8f9c', fontSize: 11, textAlign: 'center', marginHorizontal: 18, marginBottom: 8 },
   sair: { color: '#ff4f5e', fontSize: 12, fontWeight: '600' },
   nameInput: { minWidth: 150, paddingVertical: 3, color: '#f4f4fb', fontSize: 18, fontWeight: '800', textAlign: 'center', borderBottomWidth: 1, borderBottomColor: '#635bfa', marginTop: 8 },
   emailInput: { minWidth: 190, paddingVertical: 3, color: '#a2a5cf', fontSize: 11, textAlign: 'center', borderBottomWidth: 1, borderBottomColor: '#635bfa', marginTop: 2 },
