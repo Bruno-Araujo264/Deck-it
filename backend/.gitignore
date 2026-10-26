@@ -2,4 +2,14 @@
 
 /src/generated/prisma
 
+# TypeScript build output emitted alongside source files
+/src/**/*.js
+/src/**/*.js.map
+/src/**/*.d.ts
+/src/**/*.d.ts.map
+/prisma.config.js
+/prisma.config.js.map
+/prisma.config.d.ts
+/prisma.config.d.ts.map
+
 /src/generated/prisma

@@ -104,6 +104,16 @@ INSERT INTO games (slug, name, source_api)
 VALUES ('mtg', 'Magic: The Gathering', JSON_OBJECT('provider', 'scryfall'));"
 ```
 
+As views `cards` e `card_prices` são criadas pela migration `create_card_views` e leem a silver relacionando `silver.game` com `games.slug`.
+
+Se as migrations já tiverem sido aplicadas antes dessa migration existir, rode novamente:
+
+```bash
+cd backend
+npx prisma migrate deploy
+npx prisma generate
+```
+
 Para conferir se as views estão lendo a silver:
 
 ```bash
