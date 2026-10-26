@@ -86,6 +86,53 @@ export async function getProfile() {
   return request('/users/profile');
 }
 
+export async function getGames() {
+  return request('/games');
+}
+
+export async function getDecks() {
+  return request('/decks');
+}
+
+export async function getDeckItems(deckId) {
+  return request(`/decks/${deckId}/items`);
+}
+
+export async function getCards({ name, gameId, page = 1, limit = 30 } = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  if (name?.trim()) {
+    params.set('name', name.trim());
+  }
+  if (gameId) {
+    params.set('gameId', String(gameId));
+  }
+
+  return request(`/cards?${params.toString()}`);
+}
+
+export async function getCard(externalId, gameId) {
+  const params = gameId ? `?gameId=${encodeURIComponent(gameId)}` : '';
+  return request(`/cards/${encodeURIComponent(externalId)}${params}`);
+}
+
+export async function addCardToDeck(deckId, cardExternalId, quantity = 1) {
+  return request(`/decks/${deckId}/items`, {
+    method: 'POST',
+    body: JSON.stringify({ cardExternalId, quantity }),
+  });
+}
+
+export async function createDeck(gameId, name) {
+  return request('/decks', {
+    method: 'POST',
+    body: JSON.stringify({ gameId, name }),
+  });
+}
+
 export async function logout() {
   await deleteStoredValue(TOKEN_KEY);
 }

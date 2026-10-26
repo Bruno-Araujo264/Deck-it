@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,26 +13,55 @@ import {
   TextInput,
   View,
 } from 'react-native';
-
-const cardNames = [
-  'Lightning Bolt',
-  'Mountain',
-  'Goblin Guide',
-  'Monastery Swiftspear',
-  'Rift Bolt',
-  'Lava Spike',
-  'Eidolon of the Great Revel',
-  'Searing Blaze',
-];
+import { getDeckItems } from '../../api/client';
 
 export default function Decks() {
   const { t } = useTranslation();
-  const { source } = useLocalSearchParams();
+  const { source, deckId } = useLocalSearchParams();
+  const [deck, setDeck] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   function goBack() {
     const previousRoute = source === 'buscar' ? '/buscar' : source === 'adicionar' ? '/adicionar' : '/home';
     router.replace(previousRoute);
   }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDeck() {
+      if (!deckId) {
+        setError(t('deck_nao_selecionado'));
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const deckData = await getDeckItems(deckId);
+        if (isMounted) {
+          setDeck(deckData);
+        }
+      } catch (requestError) {
+        if (isMounted) {
+          setError(requestError.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadDeck();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [deckId, t]);
+
+  const cards = deck?.items ?? [];
+  const totalCards = cards.reduce((total, item) => total + (item.quantity ?? 0), 0);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -45,7 +75,9 @@ export default function Decks() {
           <Pressable onPress={goBack}>
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
-          <Text style={styles.deckTitle}>Pokemon Supremo</Text>
+          <Text style={styles.deckTitle}>
+            {isLoading ? t('carregando') : deck?.name ?? t('decks')}
+          </Text>
           <Pressable style={styles.editButton} accessibilityLabel="Editar deck">
             <Text style={styles.editIcon}>↗</Text>
           </Pressable>
@@ -54,12 +86,12 @@ export default function Decks() {
         <View style={styles.deckSummary}>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>{t('cartas')}</Text>
-            <Text style={styles.summaryValue}>60</Text>
+            <Text style={styles.summaryValue}>{totalCards}</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>{t('jogo')}</Text>
-            <Text style={styles.summaryValue}>Magic</Text>
+            <Text style={styles.summaryValue}>{deck?.game?.name ?? '-'}</Text>
           </View>
         </View>
 
@@ -74,24 +106,50 @@ export default function Decks() {
 
         <View style={styles.cardsHeader}>
           <Text style={styles.sectionTitle}>{t('cartas_no_deck')}</Text>
-          <Pressable onPress={() => router.push('/adicionar')}>
+          <Pressable
+            onPress={() => router.push({
+              pathname: '/adicionar',
+              params: {
+                deckId: String(deckId),
+                gameId: deck?.game?.id ? String(deck.game.id) : undefined,
+              },
+            })}
+          >
             <Text style={styles.addCard}>＋ {t('adicionar_cartas')}</Text>
           </Pressable>
         </View>
 
         <View style={styles.cardGrid}>
-          {cardNames.map((name) => (
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {!isLoading && !error && cards.length === 0 ? (
+            <Text style={styles.emptyText}>{t('nenhuma_carta_no_deck')}</Text>
+          ) : null}
+          {cards.map((item) => (
             <Pressable
-              key={name}
+              key={item.id}
               style={styles.cardItem}
-              onPress={() => router.push('/carta')}
+              onPress={() => router.push({
+                pathname: '/carta',
+                params: {
+                  externalId: item.cardExternalId,
+                  gameId: deck?.game?.id ? String(deck.game.id) : undefined,
+                },
+              })}
             >
-              <Image
-                source={require('../../assets/charizard.jpg')}
-                style={styles.cardImage}
-                resizeMode="contain"
-              />
-              <Text style={styles.cardName} numberOfLines={1}>{name}</Text>
+              {item.cardDetails?.imageNormal ? (
+                <Image
+                  source={{ uri: item.cardDetails.imageNormal }}
+                  style={styles.cardImage}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={styles.cardImagePlaceholder}>
+                  <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
+                </View>
+              )}
+              <Text style={styles.cardName} numberOfLines={1}>
+                {item.cardDetails?.name ?? item.cardExternalId}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -173,6 +231,17 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: '#292d62',
   },
+  cardImagePlaceholder: {
+    width: 150,
+    height: 200,
+    borderRadius: 2,
+    backgroundColor: '#292d62',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeholderText: { color: '#8588b3', fontSize: 9, textAlign: 'center' },
+  errorText: { color: '#ff8f9c', fontSize: 11, textAlign: 'center', margin: 14 },
+  emptyText: { color: '#8588b3', fontSize: 11, textAlign: 'center', margin: 20 },
   cardName: {
     width: '100%',
     marginTop: 4,

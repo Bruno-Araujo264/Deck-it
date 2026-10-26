@@ -1,5 +1,5 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import {
 
 export default function Adicionar() {
   const { t } = useTranslation();
+  const { deckId, gameId } = useLocalSearchParams();
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -87,6 +88,19 @@ export default function Adicionar() {
         <Text style={styles.title}>{t('adicionar_cartas')}</Text>
       </View>
 
+      <Pressable
+        style={styles.existingCardsButton}
+        onPress={() => router.push({
+          pathname: '/selecionar-carta',
+          params: {
+            deckId: deckId ? String(deckId) : undefined,
+            gameId: gameId ? String(gameId) : undefined,
+          },
+        })}
+      >
+        <Text style={styles.existingCardsButtonText}>{t('escolher_carta_existente')}</Text>
+      </Pressable>
+
       <View style={styles.cameraFrame}>
         {capturedPhoto ? (
           <Image source={{ uri: capturedPhoto.uri }} style={styles.preview} resizeMode="cover" />
@@ -154,6 +168,17 @@ const styles = StyleSheet.create({
   },
   backIcon: { color: '#d7d8ea', fontSize: 22, lineHeight: 19, marginTop: -2 },
   title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
+  existingCardsButton: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 7,
+    alignItems: 'center',
+    backgroundColor: '#292d62',
+    borderWidth: 1,
+    borderColor: '#5c65c8',
+  },
+  existingCardsButtonText: { color: '#f4f4fb', fontSize: 12, fontWeight: '700' },
   cameraFrame: {
     flex: 1,
     margin: 16,
