@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   KeyboardAvoidingView,
@@ -11,9 +12,47 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { register } from '../api/client';
 
 export default function Cadastro() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleRegister() {
+    setError('');
+
+    if (!nickname.trim() || !email.trim() || !password) {
+      setError('Preencha nome, e-mail e senha.');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError('Aceite os termos de uso para continuar.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await register({
+        nickname: nickname.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        acceptedTerms,
+      });
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -32,18 +71,21 @@ export default function Cadastro() {
           <Text style={styles.title}>Cadastrar</Text>
 
           <View style={styles.form}>
-            <Text style={styles.label}>Nome</Text>
+            <Text style={styles.label}>{t('nome')}</Text>
             <TextInput
               style={styles.input}
+              value={nickname}
+              onChangeText={setNickname}
               placeholder="Bruno Mars"
               placeholderTextColor="#8284a7"
               autoCapitalize="none"
               autoCorrect={false}
             />
-
-            <Text style={styles.label}>EMAIL</Text>
+            <Text style={styles.label}>{t('email')}</Text>
             <TextInput
               style={styles.input}
+              value={email}
+              onChangeText={setEmail}
               placeholder="hello@design.co"
               placeholderTextColor="#8284a7"
               keyboardType="email-address"
@@ -51,10 +93,12 @@ export default function Cadastro() {
               autoCorrect={false}
             />
 
-            <Text style={[styles.label, styles.passwordLabel]}>SENHA</Text>
+            <Text style={[styles.label, styles.passwordLabel]}>{t('senha')}</Text>
             <View style={styles.passwordInputWrap}>
               <TextInput
                 style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
                 placeholder="••••••••••••"
                 placeholderTextColor="#8284a7"
                 secureTextEntry={!showPassword}
@@ -70,24 +114,40 @@ export default function Cadastro() {
               </Pressable>
             </View>
 
-            <Pressable style={styles.forgotButton}>
-              <Text style={styles.forgotText}>Esqueceu a senha?</Text>
+            <Pressable
+              style={styles.termsRow}
+              onPress={() => setAcceptedTerms((accepted) => !accepted)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: acceptedTerms }}
+            >
+              <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+                {acceptedTerms ? <Text style={styles.checkmark}>✓</Text> : null}
+              </View>
+              <Text style={styles.termsText}>Aceito os termos de uso.</Text>
             </Pressable>
 
-            <Pressable style={styles.loginButton}>
-              <Text style={styles.loginButtonText}>Entrar</Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <Pressable
+              style={[styles.loginButton, isLoading && styles.disabledButton]}
+              onPress={handleRegister}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Cadastrando...' : t('cadastrar')}
+              </Text>
             </Pressable>
 
             <View style={styles.createAccountRow}>
-              <Text style={styles.helperText}>Já possui uma conta?</Text>
+              <Text style={styles.helperText}>{t('com_conta')}</Text>
               <Pressable onPress={() => router.push('/login')}>
-                <Text style={styles.actionText}> Faça login!</Text>
+                <Text style={styles.actionText}> {t('entrar')}!</Text>
               </Pressable>
             </View>
 
             <View style={styles.dividerRow}>
               <View style={styles.divider} />
-              <Text style={styles.dividerText}>Ou Continue Com</Text>
+              <Text style={styles.dividerText}>{t('continuar_com')}</Text>
               <View style={styles.divider} />
             </View>
 
@@ -233,6 +293,44 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  errorText: {
+    color: '#ff8f9c',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    paddingVertical: 4,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#8588b3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  checkboxChecked: {
+    backgroundColor: '#625ff0',
+    borderColor: '#625ff0',
+  },
+  checkmark: {
+    color: '#ffffff',
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  termsText: {
+    color: '#ddddE5',
+    fontSize: 10,
   },
   createAccountRow: {
     flexDirection: 'row',

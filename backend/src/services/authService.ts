@@ -4,7 +4,11 @@ import jwt from 'jsonwebtoken';
 
 export class AuthService {
   private static generateToken(userId: number, email: string): string {
-    const secret = process.env.JWT_SECRET || 'fallback_secret';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET não configurado.');
+    }
+
     return jwt.sign({ userId, email }, secret, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     } as jwt.SignOptions);

@@ -2,8 +2,11 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -22,7 +25,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/login')}
           accessibilityRole="button"
         >
-          <Text style={styles.enterText}>Entrar</Text>
+          <Text style={styles.enterText}>{t('bem_vindo')}</Text>
         </Pressable>
 
         <Text style={styles.copyright}>© - Direitos Autorais Absolum Idum Opus</Text>
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   enterButton: {
-    minWidth: 125,
+    minWidth: 150,
     height: 60,
     borderRadius: 16,
     backgroundColor: '#292d62',

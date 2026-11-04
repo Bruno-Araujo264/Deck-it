@@ -1,7 +1,8 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
@@ -14,6 +15,8 @@ import {
 } from 'react-native';
 
 export default function Adicionar() {
+  const { t } = useTranslation();
+  const { deckId, gameId } = useLocalSearchParams();
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -35,7 +38,7 @@ export default function Adicionar() {
   }
 
   function usePhoto() {
-    Alert.alert('Carta fotografada', 'A foto está pronta para ser adicionada ao seu deck.', [
+    Alert.alert(t('foto_capturada'), t('foto_pronta'), [
       { text: 'OK', onPress: () => setCapturedPhoto(null) },
     ]);
   }
@@ -82,8 +85,21 @@ export default function Adicionar() {
         <Pressable style={styles.backButton} onPress={() => router.back()} accessibilityRole="button">
           <Text style={styles.backIcon}>‹</Text>
         </Pressable>
-        <Text style={styles.title}>Adicionar Carta</Text>
+        <Text style={styles.title}>{t('adicionar_cartas')}</Text>
       </View>
+
+      <Pressable
+        style={styles.existingCardsButton}
+        onPress={() => router.push({
+          pathname: '/selecionar-carta',
+          params: {
+            deckId: deckId ? String(deckId) : undefined,
+            gameId: gameId ? String(gameId) : undefined,
+          },
+        })}
+      >
+        <Text style={styles.existingCardsButtonText}>{t('escolher_carta_existente')}</Text>
+      </Pressable>
 
       <View style={styles.cameraFrame}>
         {capturedPhoto ? (
@@ -106,10 +122,10 @@ export default function Adicionar() {
         {capturedPhoto ? (
           <View style={styles.reviewActions}>
             <Pressable style={styles.secondaryButton} onPress={() => setCapturedPhoto(null)}>
-              <Text style={styles.secondaryButtonText}>Tirar outra</Text>
+              <Text style={styles.secondaryButtonText}>{t('tirar_outra_foto')}</Text>
             </Pressable>
             <Pressable style={styles.primaryButton} onPress={usePhoto}>
-              <Text style={styles.primaryButtonText}>Usar foto</Text>
+              <Text style={styles.primaryButtonText}>{t('usar_foto')}</Text>
             </Pressable>
           </View>
         ) : (
@@ -152,6 +168,17 @@ const styles = StyleSheet.create({
   },
   backIcon: { color: '#d7d8ea', fontSize: 22, lineHeight: 19, marginTop: -2 },
   title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
+  existingCardsButton: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 7,
+    alignItems: 'center',
+    backgroundColor: '#292d62',
+    borderWidth: 1,
+    borderColor: '#5c65c8',
+  },
+  existingCardsButtonText: { color: '#f4f4fb', fontSize: 12, fontWeight: '700' },
   cameraFrame: {
     flex: 1,
     margin: 16,
