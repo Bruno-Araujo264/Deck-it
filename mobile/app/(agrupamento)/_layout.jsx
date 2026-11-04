@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const tabIcons = {
   home: '⌂',
@@ -10,6 +11,8 @@ const tabIcons = {
 };
 
 export default function GroupLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={({ route }) => ({
@@ -32,11 +35,11 @@ export default function GroupLayout() {
         ),
       })}
     >
-      <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="buscar" options={{ title: 'Busca' }} />
-      <Tabs.Screen name="decks" options={{ title: 'Decks' }} />
-      <Tabs.Screen name="adicionar" options={{ title: 'Adicionar' }} />
-      <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
+      <Tabs.Screen name="home" options={{ title: t('inicio') }} />
+      <Tabs.Screen name="buscar" options={{ title: t('buscar') }} />
+      <Tabs.Screen name="decks" options={{ title: t('decks') }} />
+      <Tabs.Screen name="adicionar" options={{ title: t('adicionar') }} />
+      <Tabs.Screen name="perfil" options={{ title: t('perfil') }} />
     </Tabs>
   );
 }

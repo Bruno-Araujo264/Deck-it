@@ -12,10 +12,29 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { login } from '../api/client';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleLogin() {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await login(email.trim(), password);
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,6 +56,8 @@ export default function LoginScreen() {
             <Text style={styles.label}>EMAIL</Text>
             <TextInput
               style={styles.input}
+              value={email}
+              onChangeText={setEmail}
               placeholder="hello@design.co"
               placeholderTextColor="#8284a7"
               keyboardType="email-address"
@@ -48,6 +69,8 @@ export default function LoginScreen() {
             <View style={styles.passwordInputWrap}>
               <TextInput
                 style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
                 placeholder="••••••••••••"
                 placeholderTextColor="#8284a7"
                 secureTextEntry={!showPassword}
@@ -67,8 +90,16 @@ export default function LoginScreen() {
               <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
-            <Pressable style={styles.loginButton} onPress={() => router.push('/home')}>
-              <Text style={styles.loginButtonText}>{t('entrar')}</Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <Pressable
+              style={[styles.loginButton, isLoading && styles.disabledButton]}
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Entrando...' : t('entrar')}
+              </Text>
             </Pressable>
 
             <View style={styles.createAccountRow}>
@@ -225,6 +256,15 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  errorText: {
+    color: '#ff8f9c',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
   },
   createAccountRow: {
     flexDirection: 'row',

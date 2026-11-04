@@ -1,7 +1,8 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -10,57 +11,107 @@ import {
   Text,
   View,
 } from 'react-native';
+import { getCard } from '../api/client';
 
 export default function Carta() {
   const { t } = useTranslation();
+  const { externalId, gameId } = useLocalSearchParams();
+  const [card, setCard] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCard() {
+      if (!externalId) {
+        setError(t('carta_nao_selecionada'));
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const cardData = await getCard(externalId, gameId);
+        if (isMounted) {
+          setCard(cardData);
+        }
+      } catch (requestError) {
+        if (isMounted) {
+          setError(requestError.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadCard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [externalId, gameId, t]);
+
+  function goBack() {
+    router.back();
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <StatusBar style="light" />
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={() => router.replace('/decks')} accessibilityLabel="Voltar">
+          <Pressable style={styles.backButton} onPress={goBack} accessibilityLabel="Voltar">
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
-          <Text style={styles.title}>Charizard Vmax</Text>
-        </View>
-
-        <Image
-          source={require('../assets/charizard.jpg')}
-          style={styles.cardImage}
-          resizeMode="contain"
-        />
-
-        <View style={styles.tagRow}>
-          <Tag label="Mythic Rare" highlighted />
-          <Tag label="Magic" />
-          <Tag label="Mythic Rare" highlighted />
-          <Tag label="Magic" />
-        </View>
-
-        <Text style={styles.sectionLabel}>{t('caracteristicas')}</Text>
-        <View style={styles.descriptionBox}>
-          <Text style={styles.description}>
-            LOREM LOREM LOREM LOREM LOREM LOREM LOREM LOREM LOREM LOREM LOREM LOREM
+          <Text style={styles.title}>
+            {isLoading ? t('carregando') : card?.name ?? t('carta')}
           </Text>
         </View>
 
-        <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statText}>{t('carta')}{`\n`}Nº 643</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statText}>{t('valor_estimado')}{`\n`}~R$ 56.46</Text>
-          </View>
-        </View>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {!error && card ? (
+          <>
+            {card.imageNormal ? (
+              <Image
+                source={{ uri: card.imageNormal }}
+                style={styles.cardImage}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
+              </View>
+            )}
 
-        <View style={styles.actions}>
-          <Pressable style={styles.actionButton}>
-            <Text style={styles.actionText}>{t('apagar_carta')}</Text>
-          </Pressable>
-          <Pressable style={styles.actionButton}>
-            <Text style={styles.actionText}>{t('editar_carta')}</Text>
-          </Pressable>
-        </View>
+            <View style={styles.tagRow}>
+              {card.rarity ? <Tag label={card.rarity} highlighted /> : null}
+              {card.setName || card.setCode ? <Tag label={card.setName ?? card.setCode} /> : null}
+              {card.cardType ? <Tag label={card.cardType} /> : null}
+            </View>
+
+            <Text style={styles.sectionLabel}>{t('caracteristicas')}</Text>
+            <View style={styles.descriptionBox}>
+              <Text style={styles.description}>
+                {card.cardText || t('descricao_indisponivel')}
+              </Text>
+            </View>
+
+            <View style={styles.statsRow}>
+              <View style={styles.statBox}>
+                <Text style={styles.statText}>
+                  {t('carta')}{`\n`}{card.collectorNumber ?? '-'}
+                </Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statText}>
+                  {t('idioma')}{`\n`}{card.lang ?? '-'}
+                </Text>
+              </View>
+            </View>
+          </>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -104,6 +155,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 16,
   },
+  imagePlaceholder: {
+    width: 120,
+    height: 168,
+    alignSelf: 'center',
+    marginTop: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#292d62',
+  },
+  placeholderText: { color: '#8588b3', fontSize: 10 },
   tagRow: {
     flexDirection: 'row',
     gap: 7,
@@ -134,14 +195,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#292d62',
   },
   statText: { color: '#f4f4fb', fontSize: 20, lineHeight: 24, fontWeight: '800', textAlign: 'center' },
-  actions: { flexDirection: 'row', gap: 12, marginHorizontal: 13, marginTop: 154 },
-  actionButton: {
-    flex: 1,
-    height: 34,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#292d62',
-  },
-  actionText: { color: '#f4f4fb', fontSize: 11, fontWeight: '700' },
+  errorText: { color: '#ff8f9b', textAlign: 'center', margin: 20, fontSize: 12 },
 });
