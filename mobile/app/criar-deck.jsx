@@ -148,7 +148,9 @@ export default function CriarDeckScreen() {
           />
 
           <Text style={styles.sectionTitle}>{t('cartas_no_deck')}</Text>
-          <Text style={styles.emptyCards}>{t('adicionar_cartas')}</Text>
+          <Pressable onPress={() => router.push('/selecionar-carta')}>
+            <Text style={styles.emptyCards}>{t('adicionar_cartas')}</Text>
+          </Pressable>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 

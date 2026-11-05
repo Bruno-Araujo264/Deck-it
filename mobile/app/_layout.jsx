@@ -11,7 +11,6 @@ export default function RootLayout() {
       <Stack.Screen name="carta" />
       <Stack.Screen name="criar-deck" />
       <Stack.Screen name="selecionar-carta" />
-      <Stack.Screen name="adicionar_deck" />
     </Stack>
   );
 }
