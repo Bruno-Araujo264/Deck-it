@@ -1,11 +1,6 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-<<<<<<< HEAD
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-=======
-import { router, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
->>>>>>> origin/dev
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -14,7 +9,6 @@ import { colors, gradients, radii, shadows, spacing, type } from '../../theme';
 
 export default function Adicionar() {
   const { t } = useTranslation();
-  const { deckId, gameId } = useLocalSearchParams();
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -85,19 +79,6 @@ export default function Adicionar() {
     <Screen stardust={false}>
       <AppHeader variant="page" title={t('adicionar_cartas')} onBack={() => router.back()} />
 
-      <Pressable
-        style={styles.existingCardsButton}
-        onPress={() => router.push({
-          pathname: '/selecionar-carta',
-          params: {
-            deckId: deckId ? String(deckId) : undefined,
-            gameId: gameId ? String(gameId) : undefined,
-          },
-        })}
-      >
-        <Text style={styles.existingCardsButtonText}>{t('escolher_carta_existente')}</Text>
-      </Pressable>
-
       <View style={styles.cameraFrame}>
         {capturedPhoto ? (
           <Image source={{ uri: capturedPhoto.uri }} style={styles.preview} resizeMode="cover" />
@@ -165,42 +146,6 @@ export default function Adicionar() {
 const CORNER = 26;
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
-=======
-  screen: { flex: 1, backgroundColor: '#101126' },
-  loading: { flex: 1, backgroundColor: '#101126' },
-  topBar: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#292d62',
-  },
-  backButton: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#292d62',
-    marginRight: 9,
-  },
-  backIcon: { color: '#d7d8ea', fontSize: 22, lineHeight: 19, marginTop: -2 },
-  title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
-  existingCardsButton: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    paddingVertical: 11,
-    borderRadius: 7,
-    alignItems: 'center',
-    backgroundColor: '#292d62',
-    borderWidth: 1,
-    borderColor: '#5c65c8',
-  },
-  existingCardsButtonText: { color: '#f4f4fb', fontSize: 12, fontWeight: '700' },
->>>>>>> origin/dev
   cameraFrame: {
     flex: 1,
     margin: spacing.md,

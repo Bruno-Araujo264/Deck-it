@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-<<<<<<< HEAD
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -23,60 +22,11 @@ function useDeckSearch(query) {
     [query],
   );
 }
-=======
-import { StatusBar } from 'expo-status-bar';
-import { useEffect, useMemo, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { getDecks } from '../../api/client';
->>>>>>> origin/dev
 
 export default function Buscar() {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
-  const [allDecks, setAllDecks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadDecks() {
-      try {
-        const userDecks = await getDecks();
-        if (isMounted) {
-          setAllDecks(userDecks);
-        }
-      } catch (requestError) {
-        if (isMounted) {
-          setError(requestError.message);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadDecks();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const decks = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    return allDecks.filter((deck) => deck.name.toLowerCase().includes(normalizedQuery));
-  }, [allDecks, query]);
+  const decks = useDeckSearch(query);
 
   return (
     <Screen>
@@ -95,7 +45,6 @@ export default function Buscar() {
         />
 
         <View style={styles.deckGrid}>
-<<<<<<< HEAD
           {decks.map((deck, index) => (
             <GlassCard
               key={`${deck.name}-${index}`}
@@ -105,39 +54,18 @@ export default function Buscar() {
               <View style={styles.imageFrame}>
                 <Image source={deck.image} style={styles.deckImage} resizeMode="cover" />
                 <View pointerEvents="none" style={styles.imageVeil} />
-=======
-          {decks.map((deck) => (
-            <Pressable
-              key={deck.id}
-              style={({ pressed }) => [styles.deckCard, pressed && styles.deckPressed]}
-              onPress={() => router.push({
-                pathname: '/decks',
-                params: { source: 'buscar', deckId: String(deck.id) },
-              })}
-            >
-              <View style={styles.imagePlaceholder}>
-                <Text style={styles.imageLabel}>DECK</Text>
->>>>>>> origin/dev
               </View>
               <Text style={styles.deckName} numberOfLines={1}>{deck.name}</Text>
               <Text style={styles.cardCount}>
-                {deck._count?.items ?? 0}
+                {deck.cards}
                 {' '}
-                {t((deck._count?.items ?? 0) === 1 ? 'carta' : 'cartas').toLowerCase()}
+                {t(deck.cards === 1 ? 'carta' : 'cartas').toLowerCase()}
               </Text>
             </GlassCard>
           ))}
         </View>
-<<<<<<< HEAD
 
         {decks.length === 0 && <Text style={styles.emptyText}>{t('nenhum_deck_encontrado')}</Text>}
-=======
-        {isLoading ? <Text style={styles.emptyText}>{t('carregando')}</Text> : null}
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        {!isLoading && !error && decks.length === 0 ? (
-          <Text style={styles.emptyText}>{t('nenhum_deck_encontrado')}</Text>
-        ) : null}
->>>>>>> origin/dev
       </ScrollView>
     </Screen>
   );
@@ -163,7 +91,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgDeepest,
     marginBottom: spacing.xs,
   },
-<<<<<<< HEAD
   deckImage: { width: '100%', height: '100%' },
   imageVeil: {
     ...StyleSheet.absoluteFillObject,
@@ -180,15 +107,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
 });
-=======
-  imageLabel: { color: '#8588b3', fontSize: 10, fontWeight: '700' },
-  deckImage: {
-    width: '100%',
-    height: '100%',
-  },
-  deckName: { color: '#f4f4fb', fontSize: 12, fontWeight: '700', marginTop: 8 },
-  cardCount: { color: '#8588b3', fontSize: 10, marginTop: 3 },
-  emptyText: { color: '#8588b3', textAlign: 'center', marginTop: 25, fontSize: 12 },
-  errorText: { color: '#ff8f9b', textAlign: 'center', marginTop: 25, fontSize: 12 },
-});
->>>>>>> origin/dev

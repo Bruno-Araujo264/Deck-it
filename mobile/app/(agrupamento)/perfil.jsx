@@ -1,24 +1,14 @@
-<<<<<<< HEAD
 import { useRef, useState } from 'react';
-=======
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
->>>>>>> origin/dev
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { AppHeader, ListGroup, ListRow, Screen, SectionLabel } from '../../components';
 import i18n, { supportedLanguages } from '../../i18n';
-<<<<<<< HEAD
 import { colors, radii, shadows, spacing, type } from '../../theme';
-=======
-import { getProfile } from '../../api/client';
->>>>>>> origin/dev
 
 const profileRows = [
-  { id: 'name', icon: '♙', labelKey: 'nome_completo' },
-  { id: 'email', icon: '✉', labelKey: 'email' },
+  { id: 'name', icon: '♙', labelKey: 'nome_completo', value: 'Bruno Mars' },
+  { id: 'email', icon: '✉', labelKey: 'email', value: 'bruno.mars@deckit.com' },
   { id: 'password', icon: '▣', labelKey: 'alterar_senha', valueKey: 'senha_atualizada' },
 ];
 
@@ -26,42 +16,10 @@ export default function Perfil() {
   const { t } = useTranslation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [editingField, setEditingField] = useState(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [profileError, setProfileError] = useState('');
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [name, setName] = useState('Bruno Mars');
+  const [email, setEmail] = useState('bruno.mars@deckit.com');
   const nameInputRef = useRef(null);
   const emailInputRef = useRef(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadProfile() {
-      try {
-        const profile = await getProfile();
-        if (!isMounted) {
-          return;
-        }
-
-        setName(profile.nickname ?? '');
-        setEmail(profile.email ?? '');
-      } catch (error) {
-        if (isMounted) {
-          setProfileError(error.message);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingProfile(false);
-        }
-      }
-    }
-
-    loadProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   function showAccountAlert(title, message) {
     Alert.alert(title, message, [{ text: 'OK' }]);
@@ -148,22 +106,15 @@ export default function Perfil() {
 
         <View style={styles.profileSummary}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{getInitials(name)}</Text>
+            <Text style={styles.avatarText}>BM</Text>
             <View style={styles.cameraBadge}>
               <Text style={styles.cameraIcon}>●</Text>
             </View>
           </View>
-          {isLoadingProfile ? (
-            <Text style={styles.loadingText}>Carregando perfil...</Text>
-          ) : (
-            <>
-              <Text style={styles.name}>{name || 'Usuário'}</Text>
-              <Text style={styles.email}>{email}</Text>
-            </>
-          )}
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.email}>{email}</Text>
         </View>
 
-<<<<<<< HEAD
         <View style={styles.section}>
           <SectionLabel>{t('dados_pessoais')}</SectionLabel>
           <ListGroup>
@@ -174,25 +125,6 @@ export default function Perfil() {
                 label={t(row.labelKey)}
                 value={
                   row.id === 'name' ? name : row.id === 'email' ? email : t(row.valueKey)
-=======
-        {profileError ? <Text style={styles.errorText}>{profileError}</Text> : null}
-
-        <Text style={styles.sectionLabel}>{t('dados_pessoais')}</Text>
-        <View style={styles.group}>
-          {profileRows.map((row, index) => (
-            <Pressable
-              key={row.id}
-              style={[styles.row, index < profileRows.length - 1 && styles.rowBorder]}
-              onPress={() => {
-                if (row.id === 'name') {
-                  setEditingField('name');
-                  nameInputRef.current?.focus();
-                } else if (row.id === 'email') {
-                  setEditingField('email');
-                  emailInputRef.current?.focus();
-                } else {
-                  showAccountAlert(t(row.labelKey), t('opcao_indisponivel'));
->>>>>>> origin/dev
                 }
                 right={renderProfileValue(row)}
                 chevron
@@ -255,19 +187,6 @@ export default function Perfil() {
   );
 }
 
-function getInitials(name) {
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
-
-  return initials || 'U';
-}
-
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { paddingBottom: spacing.xxl },
@@ -323,37 +242,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.xs,
   },
-<<<<<<< HEAD
-=======
-  title: { color: '#f4f4fb', fontSize: 16, fontWeight: '800' },
-  editButton: { paddingHorizontal: 11, paddingVertical: 5, borderRadius: 5, backgroundColor: '#292d62' },
-  editText: { color: '#e3e4f1', fontSize: 10, fontWeight: '700' },
-  profileSummary: { alignItems: 'center', paddingTop: 19, paddingBottom: 20 },
-  avatar: { width: 78, height: 78, borderRadius: 39, alignItems: 'center', justifyContent: 'center', backgroundColor: '#635bfa', borderWidth: 3, borderColor: '#817bff' },
-  avatarText: { color: '#ffffff', fontSize: 25, fontWeight: '800', letterSpacing: 1 },
-  cameraBadge: { position: 'absolute', right: -2, bottom: -2, width: 23, height: 23, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#635bfa', borderWidth: 2, borderColor: '#101126' },
-  cameraIcon: { color: '#ffffff', fontSize: 11 },
-  name: { color: '#f4f4fb', fontSize: 19, fontWeight: '800', marginTop: 10 },
-  email: { color: '#8588b3', fontSize: 11, marginTop: 3 },
-  loadingText: { color: '#8588b3', fontSize: 11, marginTop: 10 },
-  errorText: { color: '#ff8f9c', fontSize: 11, textAlign: 'center', marginHorizontal: 18, marginBottom: 8 },
-  sair: { color: '#ff4f5e', fontSize: 12, fontWeight: '600' },
-  nameInput: { minWidth: 150, paddingVertical: 3, color: '#f4f4fb', fontSize: 18, fontWeight: '800', textAlign: 'center', borderBottomWidth: 1, borderBottomColor: '#635bfa', marginTop: 8 },
-  emailInput: { minWidth: 190, paddingVertical: 3, color: '#a2a5cf', fontSize: 11, textAlign: 'center', borderBottomWidth: 1, borderBottomColor: '#635bfa', marginTop: 2 },
-  sectionLabel: { color: '#8588b3', fontSize: 9, fontWeight: '800', marginHorizontal: 13, marginBottom: 5, marginTop: 0 },
-  group: { marginHorizontal: 11, marginBottom: 22, overflow: 'hidden', borderRadius: 10, backgroundColor: '#292d62', borderWidth: 1, borderColor: '#383e7b' },
-  row: { minHeight: 47, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center' },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: '#383e7b' },
-  rowIcon: { width: 24, height: 24, marginRight: 9, alignItems: 'center', justifyContent: 'center', borderRadius: 5, backgroundColor: 'transparent' },
-  iconText: { color: '#756eff', fontSize: 16 },
-  rowLabel: { color: '#f4f4fb', fontSize: 12, flex: 1 },
-  rowSwitch: { transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], alignSelf: 'center' },
-  rowValue: { color: '#8588b3', fontSize: 10, marginRight: 9 },
-  rowInput: { color: '#ffffff', fontSize: 10, marginRight: 9 },
-  chevron: { color: '#a2a5cf', fontSize: 23, lineHeight: 23 },
-  dangerIcon: { backgroundColor: '#343262' },
-  dangerText: { color: '#ff4f5e', fontSize: 17 },
-  dangerLabel: { color: '#ff4f5e', fontSize: 12, fontWeight: '600' },
-  version: { color: '#8588b3', fontSize: 8, textAlign: 'center', marginTop: 0 },
->>>>>>> origin/dev
 });
