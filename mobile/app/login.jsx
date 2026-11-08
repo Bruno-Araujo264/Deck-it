@@ -9,11 +9,37 @@ import {
   Text,
   View,
 } from 'react-native';
+<<<<<<< HEAD
 import { Button, Field, Logo, Screen } from '../components';
 import { colors, fonts, spacing, type } from '../theme';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
+=======
+import { login } from '../api/client';
+
+export default function LoginScreen() {
+  const { t } = useTranslation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleLogin() {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await login(email.trim(), password);
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+>>>>>>> origin/dev
 
   return (
     <Screen edges={['top', 'bottom']}>
@@ -29,14 +55,23 @@ export default function LoginScreen() {
           <Logo size={88} withWordmark stacked wordmarkSize={28} style={styles.brand} />
 
           <View style={styles.form}>
+<<<<<<< HEAD
             <Field
               label="Email"
+=======
+            <Text style={styles.label}>EMAIL</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+>>>>>>> origin/dev
               placeholder="hello@design.co"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
 
+<<<<<<< HEAD
             <Field
               label={t('senha')}
               placeholder="••••••••••••"
@@ -44,12 +79,48 @@ export default function LoginScreen() {
               autoCapitalize="none"
               containerStyle={styles.spaced}
             />
+=======
+            <Text style={[styles.label, styles.passwordLabel]}>{t('senha')}</Text>
+            <View style={styles.passwordInputWrap}>
+              <TextInput
+                style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="••••••••••••"
+                placeholderTextColor="#8284a7"
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+              <Pressable
+                style={styles.eyeButton}
+                onPress={() => setShowPassword((visible) => !visible)}
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                <Text style={styles.eye}>{showPassword ? '◉' : '◌'}</Text>
+              </Pressable>
+            </View>
+>>>>>>> origin/dev
 
             <Pressable style={styles.forgotButton}>
               <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
+<<<<<<< HEAD
             <Button label={t('entrar')} onPress={() => router.push('/home')} />
+=======
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <Pressable
+              style={[styles.loginButton, isLoading && styles.disabledButton]}
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Entrando...' : t('entrar')}
+              </Text>
+            </Pressable>
+>>>>>>> origin/dev
 
             <View style={styles.createAccountRow}>
               <Text style={styles.helperText}>{t('sem_conta')}</Text>
@@ -83,11 +154,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
   },
+<<<<<<< HEAD
   brand: { marginBottom: spacing.xl },
   form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   spaced: { marginTop: spacing.md },
   forgotButton: { alignSelf: 'flex-end', paddingVertical: spacing.sm },
   forgotText: { ...type.bodySm, color: colors.gold },
+=======
+  disabledButton: {
+    opacity: 0.6,
+  },
+  errorText: {
+    color: '#ff8f9c',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+>>>>>>> origin/dev
   createAccountRow: {
     flexDirection: 'row',
     justifyContent: 'center',
