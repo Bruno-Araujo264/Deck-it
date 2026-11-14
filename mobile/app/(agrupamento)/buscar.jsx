@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   deckImage: { width: '100%', height: '100%' },
   imageVeil: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
