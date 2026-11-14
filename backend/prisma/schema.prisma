@@ -84,7 +84,7 @@ view Card {
   name            String   @db.VarChar(500)
   lang            String?  @db.VarChar(8)
   releasedAt      DateTime? @map("released_at") @db.Date
-  rarity          String?  @db.VarChar(16)
+  rarity          String?  @db.VarChar(64)
   setCode         String?  @map("set_code") @db.VarChar(16)
   setName         String?  @map("set_name") @db.VarChar(255)
   collectorNumber String?  @map("collector_number") @db.VarChar(32)

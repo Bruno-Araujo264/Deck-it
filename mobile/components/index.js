@@ -21,3 +21,6 @@ export { default as SectionLabel } from './SectionLabel';
 export { default as Tag } from './Tag';
 export { default as StatBox } from './StatBox';
 export { ListGroup, ListRow } from './ListGroup';
+export { default as AddToDeckSheet } from './AddToDeckSheet';
+export { default as ScanCardReveal } from './ScanCardReveal';
+export { default as ChatbotWidget } from './ChatbotWidget';

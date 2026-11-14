@@ -19,7 +19,6 @@ export class GameService {
       where: {
         name: {
           contains: name,
-          mode: 'insensitive',
         },
       },
     });
@@ -30,7 +29,6 @@ export class GameService {
       where: {
         name: {
           contains: query,
-          mode: 'insensitive',
         },
       },
     });

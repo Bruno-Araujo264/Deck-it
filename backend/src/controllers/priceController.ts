@@ -22,6 +22,23 @@ export class PriceController {
     }
   }
 
+  public async getCardMarket(req: AuthRequest, res: Response) {
+    try {
+      const rawExternalId = req.params.externalId;
+      const externalId = typeof rawExternalId === 'string' ? rawExternalId : rawExternalId?.[0];
+      const gameId = req.query.gameId ? Number(req.query.gameId) : undefined;
+
+      if (!externalId) {
+        return res.status(400).json({ error: 'externalId é obrigatório.' });
+      }
+
+      const market = await priceService.getCardMarket(externalId, gameId);
+      return res.status(200).json(market);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || 'Erro ao buscar o preço da carta.' });
+    }
+  }
+
   public async getDeckValuation(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.userId;
