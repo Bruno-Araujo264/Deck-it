@@ -17,7 +17,10 @@
           "recordAudioAndroid": false
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-router",
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "splash": {
       "image": "./assets/splash-icon.png",
