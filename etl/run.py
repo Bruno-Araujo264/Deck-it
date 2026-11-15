@@ -2,6 +2,7 @@
 Uso:
   python run.py --init-db                 # cria bancos e tabelas
   python run.py --game mtg                # full na primeira vez, incremental depois
+  python run.py --game pokemon            # Pokemon TCG (TCGdex)
   python run.py --game all --mode full    # forca nova carga full
 """
 import argparse
@@ -12,9 +13,9 @@ from pathlib import Path
 from common import sync_log
 from common.db import connect, run_sql_dir
 from common.log import log, setup
-from games import scryfall
+from games import scryfall, tcgdex
 
-GAMES = {"mtg": scryfall}  # ygo e pokemon entram aqui quando existirem
+GAMES = {"mtg": scryfall, "pokemon": tcgdex}  # ygo entra aqui quando existir
 
 
 def process(conn, mod, row):

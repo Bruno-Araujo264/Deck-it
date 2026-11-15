@@ -1,4 +1,18 @@
 import prisma from '../db/client.js';
+import { getBrlRates } from './exchangeService.js';
+
+/**
+ * Tipos de preço gravados pelo ETL, na ordem de preferência para o "valor estimado".
+ * Magic (Scryfall): usd, usd_foil, usd_etched, eur, eur_foil, tix.
+ * Pokémon (TCGdex): usd (TCGplayer normal), usd_holo, usd_reverse, eur (Cardmarket trend), eur_holo.
+ */
+const PRICE_PRIORITY = ['usd', 'usd_holo', 'usd_reverse', 'usd_foil', 'usd_etched', 'eur', 'eur_holo', 'eur_foil'];
+
+function currencyOf(priceType: string): 'USD' | 'EUR' | 'TIX' {
+  if (priceType.startsWith('eur')) return 'EUR';
+  if (priceType === 'tix') return 'TIX';
+  return 'USD';
+}
 
 export class PriceService {
   // Buscar histórico ou preços atuais de uma carta pelo externalId
@@ -82,6 +96,58 @@ export class PriceService {
       currency: 'BRL', 
       totalEstimatedValue: Number(totalEstimatedValue.toFixed(2)),
       itemsValuation,
+    };
+  }
+
+  /**
+   * Preço de mercado atual da carta: o registro mais recente de cada tipo de preço,
+   * convertido para reais pela cotação do dia. Não lança erro se a carta não tiver preço.
+   */
+  public async getCardMarket(externalId: string, gameId?: number) {
+    const rows = await prisma.cardPrice.findMany({
+      where: { externalId, ...(gameId !== undefined ? { gameId } : {}) },
+      orderBy: { priceDate: 'desc' },
+      take: 60,
+    });
+
+    const latest = new Map<string, (typeof rows)[number]>();
+    for (const row of rows) {
+      if (!latest.has(row.priceType)) latest.set(row.priceType, row);
+    }
+
+    const rates = await getBrlRates();
+    const toBrl = (value: number, currency: string) => {
+      const rate = currency === 'USD' ? rates?.USD : currency === 'EUR' ? rates?.EUR : undefined;
+      return rate ? Number((value * rate).toFixed(2)) : null;
+    };
+
+    const prices = [...latest.values()]
+      .map((row) => {
+        const currency = currencyOf(row.priceType);
+        const value = Number(row.price);
+        return {
+          priceType: row.priceType,
+          currency,
+          value,
+          valueBrl: toBrl(value, currency),
+          priceDate: row.priceDate,
+        };
+      })
+      .sort((a, b) => {
+        const ia = PRICE_PRIORITY.indexOf(a.priceType);
+        const ib = PRICE_PRIORITY.indexOf(b.priceType);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      });
+
+    const main = prices.find((p) => PRICE_PRIORITY.includes(p.priceType) && p.value > 0) ?? null;
+
+    return {
+      externalId,
+      estimated: main
+        ? { priceType: main.priceType, currency: main.currency, value: main.value, valueBrl: main.valueBrl }
+        : null,
+      prices,
+      rates,
     };
   }
 }

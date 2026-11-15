@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { getDeckItems } from '../../api/client';
 import {
   AppHeader,
   IconButton,
@@ -10,17 +12,6 @@ import {
   StatBox,
 } from '../../components';
 import { colors, radii, shadows, spacing, type } from '../../theme';
-
-const cardNames = [
-  'Lightning Bolt',
-  'Mountain',
-  'Goblin Guide',
-  'Monastery Swiftspear',
-  'Rift Bolt',
-  'Lava Spike',
-  'Eidolon of the Great Revel',
-  'Searing Blaze',
-];
 
 export default function Decks() {
   const { t } = useTranslation();
@@ -40,15 +31,15 @@ export default function Decks() {
       >
         <AppHeader
           variant="page"
-          title="Pokemon Supremo"
+          title={deck?.name ?? t('decks')}
           onBack={goBack}
           right={<IconButton icon="↗" accessibilityLabel="Editar deck" iconStyle={styles.editIcon} />}
           style={styles.header}
         />
 
         <View style={styles.summary}>
-          <StatBox label={t('cartas')} value="60" />
-          <StatBox label={t('jogo')} value="Magic" color={colors.mtg} />
+          <StatBox label={t('cartas')} value={totalCards} />
+          <StatBox label={t('jogo')} value={deck?.game?.name ?? '-'} color={colors.mtg} />
         </View>
 
         <SearchField
@@ -59,7 +50,10 @@ export default function Decks() {
         <SectionLabel
           style={styles.cardsLabel}
           right={
-            <Pressable onPress={() => router.push('/adicionar')} hitSlop={6}>
+            <Pressable onPress={() => router.push({
+              pathname: '/adicionar',
+              params: { deckId: String(deckId) },
+            })} hitSlop={6}>
               <Text style={styles.addCard}>＋ {t('adicionar_cartas')}</Text>
             </Pressable>
           }
@@ -70,18 +64,30 @@ export default function Decks() {
         <View style={styles.cardGrid}>
           {cardNames.map((name) => (
             <Pressable
-              key={name}
-              style={({ pressed }) => [styles.cardItem, pressed && styles.cardPressed]}
-              onPress={() => router.push('/carta')}
+              key={item.id}
+              style={styles.cardItem}
+              onPress={() => router.push({
+                pathname: '/carta',
+                params: {
+                  externalId: item.cardExternalId,
+                  gameId: deck?.game?.id ? String(deck.game.id) : undefined,
+                },
+              })}
             >
-              <View style={styles.cardFrame}>
+              {item.cardDetails?.imageNormal ? (
                 <Image
-                  source={require('../../assets/charizard.jpg')}
+                  source={{ uri: item.cardDetails.imageNormal }}
                   style={styles.cardImage}
                   resizeMode="cover"
                 />
-              </View>
-              <Text style={styles.cardName} numberOfLines={1}>{name}</Text>
+              ) : (
+                <View style={styles.cardImagePlaceholder}>
+                  <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
+                </View>
+              )}
+              <Text style={styles.cardName} numberOfLines={1}>
+                {item.cardDetails?.name ?? item.cardExternalId}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -122,6 +128,17 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...shadows.card,
   },
+  cardImagePlaceholder: {
+    width: 150,
+    height: 200,
+    borderRadius: 2,
+    backgroundColor: '#292d62',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeholderText: { color: '#8588b3', fontSize: 9, textAlign: 'center' },
+  errorText: { color: '#ff8f9c', fontSize: 11, textAlign: 'center', margin: 14 },
+  emptyText: { color: '#8588b3', fontSize: 11, textAlign: 'center', margin: 20 },
   cardImage: { width: '100%', height: '100%' },
   cardName: {
     width: '100%',

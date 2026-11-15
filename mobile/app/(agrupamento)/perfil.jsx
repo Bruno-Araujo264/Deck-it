@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { AppHeader, ListGroup, ListRow, Screen, SectionLabel } from '../../components';
 import i18n, { supportedLanguages } from '../../i18n';
+import { getProfile } from '../../api/client';
 import { colors, radii, shadows, spacing, type } from '../../theme';
 
 const profileRows = [
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
   email: { ...type.bodySm, color: colors.textSecondary, marginTop: 2 },
 
   section: { marginHorizontal: spacing.gutter, marginBottom: spacing.lg },
-  rowSwitch: { transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }] },
+  rowSwitch: { transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }], alignSelf: 'center' },
   rowInput: {
     ...type.bodySm,
     color: colors.textPrimary,

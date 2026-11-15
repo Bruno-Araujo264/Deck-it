@@ -1,12 +1,13 @@
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, radii, shadows, sizes, type } from '../../theme';
 
 const tabIcons = {
   home: '⌂',
   buscar: '⌕',
-  decks: '□',
   adicionar: '+',
+  decks: '□',
   perfil: '♙',
 };
 
@@ -34,11 +35,11 @@ export default function GroupLayout() {
         ),
       })}
     >
-      <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="buscar" options={{ title: 'Busca' }} />
-      <Tabs.Screen name="decks" options={{ title: 'Decks' }} />
-      <Tabs.Screen name="adicionar" options={{ title: 'Adicionar' }} />
-      <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
+      <Tabs.Screen name="home" options={{ title: t('inicio') }} />
+      <Tabs.Screen name="buscar" options={{ title: t('buscar') }} />
+      <Tabs.Screen name="adicionar" options={{ title: t('adicionar') }} />
+      <Tabs.Screen name="decks" options={{ title: t('decks') }} />
+      <Tabs.Screen name="perfil" options={{ title: t('perfil') }} />
     </Tabs>
   );
 }

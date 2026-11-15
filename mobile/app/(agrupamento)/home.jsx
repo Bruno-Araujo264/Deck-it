@@ -1,84 +1,134 @@
+import { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import {
-  AppHeader,
+import { FlatList, StyleSheet, Text, View, Pressable } from 'react-native';
+import {AppHeader,
   GemChip,
   GlassCard,
-  Screen,
   SectionLabel,
   Tag,
 } from '../../components';
 import { colors, gameColor, radii, spacing, type } from '../../theme';
-
-const categories = [
-  { label: 'Magic', icon: '✣' },
-  { label: 'Pokémon', icon: '☆' },
-  { label: 'Yu-Gi-Oh', icon: '◈' },
-  { label: 'Lorcana', icon: '✤' },
-];
-
-const decks = [
-  { game: 'Magic', name: 'Commander Red Burn', cards: 100, age: '2h ago' },
-  { game: 'Pokémon', name: 'Charizard Ex Deck', cards: 60, age: '1d ago' },
-  { game: 'Yu-Gi-Oh', name: 'Blue-Eyes Dragon', cards: 40, age: '3d ago' },
-];
-
+import { router } from 'expo-router';
+import { getDecks, getGames } from '../../api/client';
 export default function HomeScreen() {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
+	const [categories, setCategories] = useState([]);
+	const [decks, setDecks] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState('');
 
-  return (
-    <Screen>
-      <FlatList
-        style={styles.list}
-        contentContainerStyle={styles.content}
-        data={decks}
-        keyExtractor={(deck) => deck.name}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            <AppHeader tagline="Mesa Encantada TCG" style={styles.header} />
+	useEffect(() => {
+		let isMounted = true;
 
-            <SectionLabel style={styles.realmLabel}>Filtrar por reino</SectionLabel>
-            <FlatList
-              horizontal
-              data={categories}
-              keyExtractor={(category) => category.label}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryList}
-              renderItem={({ item }) => <GemChip label={item.label} game={item.label} />}
-            />
+		async function loadHome() {
+			try {
+				const [games, userDecks] = await Promise.all([getGames(), getDecks()]);
+				if (!isMounted) {
+					return;
+				}
 
+				setCategories(games.map((game) => ({
+					...game,
+					icon: getGameIcon(game.slug),
+				})));
+				setDecks(userDecks);
+			} catch (requestError) {
+				if (isMounted) {
+					setError(requestError.message);
+				}
+			} finally {
+				if (isMounted) {
+					setIsLoading(false);
+				}
+			}
+		}
+
+		loadHome();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	return (
+		<SafeAreaView style={styles.safeArea} edges={['top']}>
+			<FlatList
+				style={styles.list}
+				contentContainerStyle={styles.content}
+				data={decks}
+				keyExtractor={(deck) => String(deck.id)}
+				showsVerticalScrollIndicator={false}
+				ListHeaderComponent={
+					<>
+						<AppHeader tagline="Deck It" style={styles.header} />
+						<View style={styles.header}>
+							<Pressable
+								style={styles.addDeckButton}
+								onPress={() => router.push('/criar-deck')}
+								accessibilityRole="button"
+								accessibilityLabel={t('criar_deck')}
+							>
+								<Text style={styles.addDeckText}>＋ {t('criar_deck')}</Text>
+							</Pressable>
+						</View>
+
+						<FlatList
+							horizontal
+							data={categories}
+							keyExtractor={(category) => String(category.id)}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.categoryList}
+              renderItem={({ item }) => <GemChip label={item.name} game={item.slug} />}
+						/>
+						{isLoading ? (
+							<Text style={[styles.statusText, styles.recentTitle]}>Carregando...</Text>
+						) : error ? (
+							<Text style={styles.errorText}>{error}</Text>
+						) : decks.length === 0 ? (
+							<View style={styles.emptyState}>
+								<Text style={styles.emptyTitle}>{t('sem_decks')}</Text>
+								<Pressable style={styles.createButton} onPress={() => router.push('/criar-deck')}>
+									<Text style={styles.createButtonText}>{t('criar_primeiro_deck')}</Text>
+								</Pressable>
+							</View>
+						) : (
             <SectionLabel style={styles.recentLabel}>{t('decks_recentes')}</SectionLabel>
-          </>
-        }
-        renderItem={({ item }) => {
-          const gem = gameColor(item.game);
+						)}
+					</>
+				}
+				renderItem={({ item }) => {
+          const gem = gameColor(item.game.slug);
           return (
-            <GlassCard glowColor={gem} onPress={() => {}} style={styles.deckCard}>
+            <GlassCard glowColor={gem} onPress={() => {router.push({ pathname: '/decks', params: { deckId: String(item.id) } })}} style={styles.deckCard}>
               <View style={[styles.deckImage, { borderColor: `${gem}66` }]}>
                 <Text style={[styles.imageLabel, { color: gem }]}>IMAGE</Text>
               </View>
 
               <View style={styles.deckInfo}>
-                <Tag label={item.game} color={gem} style={styles.gameTag} />
+                <Tag label={item.game.name} color={gem} style={styles.gameTag} />
                 <Text style={styles.deckName} numberOfLines={1}>{item.name}</Text>
                 <Text style={styles.cardCount}>
-                  {item.cards}
-                  {' '}
-                  {t(item.cards === 1 ? 'carta' : 'cartas').toLowerCase()}
+                  {item._count?.items ?? 0}
+									{' '}
+									{t((item._count?.items ?? 0) === 1 ? 'carta' : 'cartas').toLowerCase()}
                 </Text>
               </View>
 
-              <Text style={styles.age}>{item.age}</Text>
+              <Text style={styles.age}>{formatAge(item.updatedAt)}</Text>
             </GlassCard>
           );
         }}
-      />
-    </Screen>
-  );
+			/>
+		</SafeAreaView>
+	);
 }
 
 const styles = StyleSheet.create({
+	safeArea: {
+  flex: 1,
+  backgroundColor: colors.bgDeep,
+},
   list: { flex: 1 },
   content: { paddingBottom: spacing.lg },
   header: { marginBottom: spacing.lg },
@@ -89,6 +139,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xs,
   },
   recentLabel: { marginHorizontal: spacing.gutter, marginTop: spacing.lg },
+	addDeckButton: { paddingHorizontal: 8, paddingVertical: 5 },
+	addDeckText: { color: '#a2a5cf', fontSize: 9, fontWeight: '600' },
   deckCard: {
     marginHorizontal: spacing.gutter,
     marginBottom: spacing.sm,

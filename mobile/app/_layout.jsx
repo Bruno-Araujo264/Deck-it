@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { View } from 'react-native';
 import '../i18n';
+import { ChatbotWidget } from '../components';
 import { colors, fontAssets } from '../theme';
 
 // Mantém a splash na tela até as fontes terminarem de carregar — evita o
@@ -26,21 +27,25 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        // Evita o flash branco padrão entre telas: o fundo do stack já nasce
-        // na cor "Noite Encantada" do guia de estilo.
-        contentStyle: { backgroundColor: colors.bgDeep },
-      }}
-    >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="cadastro" />
-      <Stack.Screen name="(agrupamento)" />
-      <Stack.Screen name="carta" />
-      <Stack.Screen name="criar-deck" />
-      <Stack.Screen name="selecionar-carta" />
-    </Stack>
+    <View style={{ flex: 1, backgroundColor: colors.bgDeep }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          // Evita o flash branco padrão entre telas: o fundo do stack já nasce
+          // na cor "Noite Encantada" do guia de estilo.
+          contentStyle: { backgroundColor: colors.bgDeep },
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="cadastro" />
+        <Stack.Screen name="(agrupamento)" />
+        <Stack.Screen name="carta" />
+        <Stack.Screen name="criar-deck" />
+        <Stack.Screen name="selecionar-carta" />
+      </Stack>
+      {/* Assistente com IA: acompanha o app todo depois do login. */}
+      <ChatbotWidget />
+    </View>
   );
 }

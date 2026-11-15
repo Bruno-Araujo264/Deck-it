@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,9 +12,47 @@ import {
 } from 'react-native';
 import { Button, Field, Logo, Screen } from '../components';
 import { colors, fonts, spacing, type } from '../theme';
+import { register } from '../api/client';
 
 export default function Cadastro() {
   const { t } = useTranslation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleRegister() {
+    setError('');
+
+    if (!nickname.trim() || !email.trim() || !password) {
+      setError('Preencha nome, e-mail e senha.');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError('Aceite os termos de uso para continuar.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await register({
+        nickname: nickname.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        acceptedTerms,
+      });
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Screen edges={['top', 'bottom']}>
@@ -32,6 +71,8 @@ export default function Cadastro() {
           <View style={styles.form}>
             <Field
               label={t('nome')}
+              value={nickname}
+              onChangeText={setNickname}
               placeholder="Bruno Mars"
               autoCapitalize="none"
               autoCorrect={false}
@@ -39,7 +80,9 @@ export default function Cadastro() {
 
             <Field
               label={t('email')}
-              placeholder="hello@design.co"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="bruno@deckit.com"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -48,6 +91,8 @@ export default function Cadastro() {
 
             <Field
               label={t('senha')}
+              value={password}
+              onChangeText={setPassword}
               placeholder="••••••••••••"
               secure
               autoCapitalize="none"
@@ -58,7 +103,7 @@ export default function Cadastro() {
               <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
-            <Button label={t('entrar')} />
+            <Button label={t('entrar')} onPress={handleRegister} />
 
             <View style={styles.createAccountRow}>
               <Text style={styles.helperText}>{t('com_conta')}</Text>
@@ -98,6 +143,35 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.lg,
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    paddingVertical: 4,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#8588b3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  checkboxChecked: {
+    backgroundColor: '#625ff0',
+    borderColor: '#625ff0',
+  },
+  checkmark: {
+    color: '#ffffff',
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  termsText: {
+    color: '#ddddE5',
+    fontSize: 10,
   },
   form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   spaced: { marginTop: spacing.md },

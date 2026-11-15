@@ -1,32 +1,43 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { getDecks } from '../../api/client';
+import { Image, ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { AppHeader, GlassCard, Screen, SearchField } from '../../components';
 import { colors, radii, spacing, type } from '../../theme';
-
-const allDecks = [
-  { name: 'Sliver Overlord', cards: 100, image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Blue Counterspell', cards: 60, image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Goblins Aggro', cards: 60, image: require('../../assets/pokemon-back.jpg') },
-  { name: 'DECK SUPREMO', cards: 100, image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Sliver Overlord', cards: 100, image: require('../../assets/yugioh-back.jpg') },
-  { name: 'Blue Counterspell', cards: 60, image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Goblins Aggro', cards: 60, image: require('../../assets/pokemon-back.jpg') },
-  { name: 'Selesnya Lifegain', cards: 100, image: require('../../assets/yugioh-back.jpg') },
-];
-
-function useDeckSearch(query) {
-  return useMemo(
-    () => allDecks.filter((deck) => deck.name.toLowerCase().includes(query.toLowerCase())),
-    [query],
-  );
-}
 
 export default function Buscar() {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
-  const decks = useDeckSearch(query);
+  const [allDecks, setAllDecks] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDecks() {
+      try {
+        const userDecks = await getDecks();
+        if (isMounted) {
+          setAllDecks(userDecks);
+        }
+      } catch (requestError) {
+        if (isMounted) {
+          setError(requestError.message);
+        }
+      }
+    }
+
+    loadDecks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const decks = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return allDecks.filter((deck) => deck.name.toLowerCase().includes(normalizedQuery));
+  }, [allDecks, query]);
 
   return (
     <Screen>
@@ -45,11 +56,14 @@ export default function Buscar() {
         />
 
         <View style={styles.deckGrid}>
-          {decks.map((deck, index) => (
+          {decks.map((deck) => (
             <GlassCard
-              key={`${deck.name}-${index}`}
-              onPress={() => router.push({ pathname: '/decks', params: { source: 'buscar' } })}
+              key={deck.id}
               style={styles.deckCard}
+              onPress={() => router.push({
+                pathname: '/decks',
+                params: { source: 'buscar', deckId: String(deck.id) },
+              })}
             >
               <View style={styles.imageFrame}>
                 <Image source={deck.image} style={styles.deckImage} resizeMode="cover" />
@@ -64,7 +78,6 @@ export default function Buscar() {
             </GlassCard>
           ))}
         </View>
-
         {decks.length === 0 && <Text style={styles.emptyText}>{t('nenhum_deck_encontrado')}</Text>}
       </ScrollView>
     </Screen>
@@ -93,7 +106,7 @@ const styles = StyleSheet.create({
   },
   deckImage: { width: '100%', height: '100%' },
   imageVeil: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.borderSubtle,

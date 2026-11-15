@@ -90,8 +90,8 @@ export async function getGames() {
   return request('/games');
 }
 
-export async function getDecks() {
-  return request('/decks');
+export async function getDecks(gameId) {
+  return request(gameId ? `/decks?gameId=${encodeURIComponent(gameId)}` : '/decks');
 }
 
 export async function getDeckItems(deckId) {
@@ -119,6 +119,12 @@ export async function getCard(externalId, gameId) {
   return request(`/cards/${encodeURIComponent(externalId)}${params}`);
 }
 
+/** Preço atual da carta (mais recente de cada tipo), já convertido para reais. */
+export async function getCardMarket(externalId, gameId) {
+  const params = gameId ? `?gameId=${encodeURIComponent(gameId)}` : '';
+  return request(`/cards/${encodeURIComponent(externalId)}/market${params}`);
+}
+
 export async function addCardToDeck(deckId, cardExternalId, quantity = 1) {
   return request(`/decks/${deckId}/items`, {
     method: 'POST',
@@ -130,6 +136,32 @@ export async function createDeck(gameId, name) {
   return request('/decks', {
     method: 'POST',
     body: JSON.stringify({ gameId, name }),
+  });
+}
+
+/**
+ * Envia a foto da carta para o backend, que usa IA para ler a carta
+ * e cruza o resultado com o catálogo.
+ */
+export async function scanCard({ base64, mimeType = 'image/jpeg', gameId }) {
+  return request('/scan', {
+    method: 'POST',
+    body: JSON.stringify({
+      image: base64,
+      mimeType,
+      ...(gameId ? { gameId: Number(gameId) } : {}),
+    }),
+  });
+}
+
+/**
+ * Conversa com o assistente (Mago do Deck-it).
+ * messages: [{ role: 'user' | 'assistant', text }] — o backend usa as últimas 12.
+ */
+export async function sendChatMessage(messages) {
+  return request('/chat', {
+    method: 'POST',
+    body: JSON.stringify({ messages }),
   });
 }
 

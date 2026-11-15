@@ -98,7 +98,7 @@ describe('GameService - Testes Unitários Completos', () => {
   });
 
   describe('searchGames', () => {
-    it('[Caminho Feliz] deve buscar jogos de forma case-insensitive usando o operador contains', async () => {
+    it('[Caminho Feliz] deve buscar jogos pelo nome usando contains (no MySQL a collation já ignora maiúsculas)', async () => {
       const query = 'zelda';
       const mockGames = [{ id: 1, slug: 'zelda-botw', name: 'Zelda', sourceApi: ['url'] }];
 
@@ -110,7 +110,6 @@ describe('GameService - Testes Unitários Completos', () => {
         where: {
           name: {
             contains: query,
-            mode: 'insensitive',
           },
         },
       });

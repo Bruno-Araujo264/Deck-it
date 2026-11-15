@@ -1,0 +1,41 @@
+-- Espelho da API do TCGdex (Pokemon TCG). Aninhados em JSON e payload com o objeto original inteiro.
+CREATE TABLE IF NOT EXISTS bronze.tcgdex_cards (
+  _row_id          BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  _load_id         VARCHAR(64)  NOT NULL,
+  _ingested_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  _source_file     VARCHAR(512) NULL,
+  _row_hash        CHAR(64)     NOT NULL,
+  id               VARCHAR(64)  NOT NULL,
+  local_id         VARCHAR(32)  NULL,
+  name             VARCHAR(255) NULL,
+  category         VARCHAR(32)  NULL,
+  rarity           VARCHAR(64)  NULL,
+  illustrator      VARCHAR(255) NULL,
+  hp               INT          NULL,
+  stage            VARCHAR(32)  NULL,
+  evolve_from      VARCHAR(255) NULL,
+  description      TEXT         NULL,
+  effect           TEXT         NULL,
+  retreat          INT          NULL,
+  regulation_mark  VARCHAR(8)   NULL,
+  image            VARCHAR(500) NULL,
+  updated          VARCHAR(40)  NULL,
+  set_id           VARCHAR(32)  NULL,
+  set_name         VARCHAR(255) NULL,
+  set_code         VARCHAR(16)  NULL,
+  release_date     VARCHAR(16)  NULL,
+  serie_id         VARCHAR(32)  NULL,
+  types            JSON         NULL,
+  attacks          JSON         NULL,
+  abilities        JSON         NULL,
+  weaknesses       JSON         NULL,
+  variants         JSON         NULL,
+  legal            JSON         NULL,
+  pricing          JSON         NULL,
+  payload          JSON         NOT NULL,
+  KEY idx_load (_load_id),
+  KEY idx_id_hash (id, _row_hash)
+);
+
+-- Raridades do Pokemon passam de 16 caracteres (ex.: Special illustration rare). Idempotente.
+ALTER TABLE silver.card MODIFY rarity VARCHAR(64) NULL;

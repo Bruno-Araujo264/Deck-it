@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,11 +10,30 @@ import {
   Text,
   View,
 } from 'react-native';
+import { login } from '../api/client';
 import { Button, Field, Logo, Screen } from '../components';
 import { colors, fonts, spacing, type } from '../theme';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleLogin() {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await login(email.trim(), password);
+      router.replace('/(agrupamento)/home');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Screen edges={['top', 'bottom']}>
@@ -31,6 +51,8 @@ export default function LoginScreen() {
           <View style={styles.form}>
             <Field
               label="Email"
+              value={email}
+              onChangeText={setEmail}
               placeholder="hello@design.co"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -39,6 +61,8 @@ export default function LoginScreen() {
 
             <Field
               label={t('senha')}
+              value={password}
+              onChangeText={setPassword}
               placeholder="••••••••••••"
               secure
               autoCapitalize="none"
@@ -49,7 +73,7 @@ export default function LoginScreen() {
               <Text style={styles.forgotText}>{t('esqueci_senha')}?</Text>
             </Pressable>
 
-            <Button label={t('entrar')} onPress={() => router.push('/home')} />
+            <Button label={t('entrar')} onPress={handleLogin} />
 
             <View style={styles.createAccountRow}>
               <Text style={styles.helperText}>{t('sem_conta')}</Text>
