@@ -1,17 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppHeader, Button, GlassCard, Screen, SearchField } from '../components';
+import { colors, radii, spacing, type } from '../theme';
 import { addCardToDeck, getCards } from '../api/client';
 
 function cleanCardName(name) {
@@ -78,32 +70,26 @@ export default function SelecionarCarta() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar style="light" />
+    <Screen>
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} accessibilityRole="button">
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
-          <Text style={styles.title}>{t('escolher_carta_existente')}</Text>
-        </View>
+        <AppHeader
+          variant="page"
+          title={t('escolher_carta_existente')}
+          onBack={() => router.back()}
+          style={styles.header}
+        />
 
-        <View style={styles.searchBox}>
-          <Text style={styles.searchIcon}>⌕</Text>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            style={styles.searchInput}
-            placeholder={t('buscar_cartas')}
-            placeholderTextColor="#8588b3"
-            autoCapitalize="none"
-            returnKeyType="search"
-          />
-        </View>
+        <SearchField
+          value={query}
+          onChangeText={setQuery}
+          placeholder={t('buscar_cartas')}
+          autoCapitalize="none"
+          style={styles.search}
+        />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {isLoading ? <Text style={styles.statusText}>{t('carregando')}</Text> : null}
@@ -113,96 +99,86 @@ export default function SelecionarCarta() {
 
         <View style={styles.cardGrid}>
           {cards.map((card) => (
-            <View key={card.externalId} style={styles.cardItem}>
-              {card.imageNormal ? (
-                <Image source={{ uri: card.imageNormal }} style={styles.cardImage} resizeMode="contain" />
-              ) : (
-                <View style={styles.imagePlaceholder}>
-                  <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
-                </View>
-              )}
+            <GlassCard key={card.externalId} style={styles.cardItem}>
+              <View style={styles.imageFrame}>
+                {card.imageNormal ? (
+                  <Image
+                    source={{ uri: card.imageNormal }}
+                    style={styles.cardImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
+                  </View>
+                )}
+              </View>
               <Text style={styles.cardName} numberOfLines={2}>
                 {cleanCardName(card.name)}
               </Text>
-              <Pressable
-                style={styles.addButton}
-                onPress={() => handleAddCard(card)}
+              <Button
+                label={addingCardId === card.externalId ? t('carregando') : t('adicionar')}
+                size="sm"
+                full
                 disabled={addingCardId === card.externalId}
-              >
-                <Text style={styles.addButtonText}>
-                  {addingCardId === card.externalId ? t('carregando') : t('adicionar')}
-                </Text>
-              </Pressable>
-            </View>
+                onPress={() => handleAddCard(card)}
+                style={styles.addButton}
+              />
+            </GlassCard>
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#101126' },
-  screen: { flex: 1, backgroundColor: '#101126' },
-  content: { paddingBottom: 24 },
-  header: {
-    height: 44,
-    paddingHorizontal: 13,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#292d62',
+  screen: { flex: 1 },
+  content: { paddingBottom: spacing.lg },
+  header: { marginBottom: spacing.lg },
+  search: { marginHorizontal: spacing.gutter, marginBottom: spacing.lg },
+  errorText: {
+    ...type.bodySm,
+    color: colors.danger,
+    textAlign: 'center',
+    marginHorizontal: spacing.gutter,
+    marginBottom: spacing.sm,
   },
-  backIcon: { color: '#d7d8ea', fontSize: 27, lineHeight: 25, marginRight: 9 },
-  title: { color: '#f4f4fb', fontSize: 14, fontWeight: '800' },
-  searchBox: {
-    height: 36,
-    marginHorizontal: 16,
-    marginTop: 24,
-    marginBottom: 20,
-    paddingHorizontal: 9,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#292d62',
-    borderRadius: 7,
+  statusText: {
+    ...type.bodyMd,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.md,
   },
-  searchIcon: { color: '#a2a5cf', fontSize: 22, marginRight: 5 },
-  searchInput: { flex: 1, color: '#f4f4fb', fontSize: 12, padding: 0 },
+  emptyText: {
+    ...type.bodyMd,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.lg,
+  },
   cardGrid: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.gutter,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    rowGap: 13,
+    rowGap: spacing.sm,
   },
-  cardItem: {
-    width: '47%',
-    minHeight: 190,
-    padding: 9,
-    borderRadius: 9,
-    backgroundColor: '#292d62',
-    borderWidth: 1,
-    borderColor: '#383e7b',
-  },
-  cardImage: { width: '100%', height: 125 },
-  imagePlaceholder: {
+  cardItem: { width: '48%', gap: spacing.xxs },
+  imageFrame: {
     height: 125,
+    borderRadius: radii.md,
+    overflow: 'hidden',
+    backgroundColor: colors.bgDeepest,
+    marginBottom: spacing.xxs,
+  },
+  cardImage: { width: '100%', height: '100%' },
+  imagePlaceholder: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#20234d',
+    backgroundColor: colors.bgDeepest,
   },
-  placeholderText: { color: '#8588b3', fontSize: 10, textAlign: 'center' },
-  cardName: { color: '#f4f4fb', fontSize: 11, fontWeight: '700', marginTop: 7 },
-  addButton: {
-    marginTop: 8,
-    paddingVertical: 6,
-    borderRadius: 5,
-    alignItems: 'center',
-    backgroundColor: '#625ff0',
-  },
-  addButtonText: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  statusText: { color: '#8588b3', textAlign: 'center', marginBottom: 16, fontSize: 12 },
-  emptyText: { color: '#8588b3', textAlign: 'center', marginTop: 25, fontSize: 12 },
-  errorText: { color: '#ff8f9b', textAlign: 'center', marginHorizontal: 16, marginBottom: 14, fontSize: 12 },
+  placeholderText: { ...type.labelSm, color: colors.textMuted, textAlign: 'center' },
+  cardName: { ...type.titleMd, color: colors.textPrimary, minHeight: 40 },
+  addButton: { marginTop: spacing.xs },
 });

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   KeyboardAvoidingView,
@@ -10,9 +8,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import { AppHeader, Button, Field, GlassCard, Screen, SectionLabel } from '../components';
+import { colors, radii, sizes, spacing, type } from '../theme';
 import { createDeck, getGames } from '../api/client';
 
 export default function CriarDeckScreen() {
@@ -77,171 +76,156 @@ export default function CriarDeckScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <StatusBar style="light" />
+    <Screen edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.screen}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.topBar}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
-          <Text style={styles.title}>{t('criar_deck')}</Text>
-          <Pressable onPress={() => router.back()}>
-            <Text style={styles.cancelText}>{t('cancelar')}</Text>
-          </Pressable>
-        </View>
+        <AppHeader
+          variant="page"
+          title={t('criar_deck')}
+          onBack={() => router.back()}
+          right={
+            <Button
+              label={t('cancelar')}
+              variant="ghost"
+              size="sm"
+              onPress={() => router.back()}
+            />
+          }
+        />
 
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <FieldLabel text={t('nome_do_deck')} />
-          <TextInput
-            style={styles.input}
+          <Field
+            label={t('nome_do_deck')}
             value={name}
             onChangeText={setName}
             placeholder={t('nome_deck_placeholder')}
-            placeholderTextColor="#8588b3"
             autoCapitalize="sentences"
           />
 
-          <FieldLabel text={t('tipo_de_jogo')} />
-          <Pressable
-            style={styles.select}
-            onPress={() => setIsGamePickerOpen((open) => !open)}
-            disabled={isLoading}
-          >
-            <Text style={[styles.selectText, !selectedGame && styles.placeholder]}>
-              {isLoading ? t('carregando') : selectedGame?.name ?? t('selecione_um_jogo')}
-            </Text>
-            <Text style={styles.chevron}>{isGamePickerOpen ? '⌃' : '⌄'}</Text>
-          </Pressable>
+          <View style={styles.spaced}>
+            <Text style={styles.label}>{t('tipo_de_jogo')}</Text>
+            <Pressable
+              style={[styles.select, isGamePickerOpen && styles.selectOpen]}
+              onPress={() => setIsGamePickerOpen((open) => !open)}
+              disabled={isLoading}
+            >
+              <Text style={[styles.selectText, !selectedGame && styles.placeholder]}>
+                {isLoading ? t('carregando') : selectedGame?.name ?? t('selecione_um_jogo')}
+              </Text>
+              <Text style={styles.chevron}>{isGamePickerOpen ? '⌃' : '⌄'}</Text>
+            </Pressable>
 
-          {isGamePickerOpen ? (
-            <View style={styles.gameOptions}>
-              {games.length === 0 ? (
-                <Text style={styles.optionText}>{t('nenhum_jogo_disponivel')}</Text>
-              ) : (
-                games.map((game) => (
-                  <Pressable
-                    key={game.id}
-                    style={styles.option}
-                    onPress={() => {
-                      setSelectedGame(game);
-                      setIsGamePickerOpen(false);
-                    }}
-                  >
-                    <Text style={styles.optionText}>{game.name}</Text>
-                  </Pressable>
-                ))
-              )}
-            </View>
-          ) : null}
+            {isGamePickerOpen ? (
+              <GlassCard style={styles.gameOptions}>
+                {games.length === 0 ? (
+                  <Text style={styles.optionEmpty}>{t('nenhum_jogo_disponivel')}</Text>
+                ) : (
+                  games.map((game, index) => (
+                    <Pressable
+                      key={game.id}
+                      style={[styles.option, index < games.length - 1 && styles.optionBorder]}
+                      onPress={() => {
+                        setSelectedGame(game);
+                        setIsGamePickerOpen(false);
+                      }}
+                    >
+                      <Text style={styles.optionText}>{game.name}</Text>
+                    </Pressable>
+                  ))
+                )}
+              </GlassCard>
+            ) : null}
+          </View>
 
-          <FieldLabel text={t('descricao_opcional')} />
-          <TextInput
-            style={[styles.input, styles.descriptionInput]}
+          <Field
+            label={t('descricao_opcional')}
             value={description}
             onChangeText={setDescription}
             placeholder={t('descricao_placeholder')}
-            placeholderTextColor="#8588b3"
             multiline
+            textAlignVertical="top"
+            style={styles.descriptionBox}
+            containerStyle={styles.spaced}
           />
 
-          <Text style={styles.sectionTitle}>{t('cartas_no_deck')}</Text>
-          <Pressable onPress={() => router.push('/selecionar-carta')}>
-            <Text style={styles.emptyCards}>{t('adicionar_cartas')}</Text>
-          </Pressable>
+          <SectionLabel style={styles.section}>{t('cartas_no_deck')}</SectionLabel>
+          <Button
+            label={t('adicionar_cartas')}
+            icon="+"
+            variant="outline"
+            full
+            onPress={() => router.push('/selecionar-carta')}
+          />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          <Pressable
-            style={[styles.createButton, isSaving && styles.disabledButton]}
+          <Button
+            label={isSaving ? t('carregando') : t('criar_deck')}
             onPress={handleCreateDeck}
             disabled={isSaving}
-          >
-            <Text style={styles.createButtonText}>
-              {isSaving ? t('carregando') : t('criar_deck')}
-            </Text>
-          </Pressable>
+            full
+            style={styles.submit}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-function FieldLabel({ text }) {
-  return <Text style={styles.fieldLabel}>{text.toUpperCase()}</Text>;
-}
-
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#101126' },
-  screen: { flex: 1, backgroundColor: '#101126' },
-  topBar: {
-    height: 66,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#3767d9',
-    borderStyle: 'dotted',
+  screen: { flex: 1 },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
-  backButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#292d62',
-    marginRight: 10,
+  spaced: { marginTop: spacing.md },
+  label: {
+    ...type.overline,
+    color: colors.textSecondary,
+    marginBottom: spacing.xxs,
+    marginLeft: spacing.xxs,
   },
-  backIcon: { color: '#ffffff', fontSize: 24, lineHeight: 22 },
-  title: { flex: 1, color: '#ffffff', fontSize: 15, fontWeight: '800' },
-  cancelText: { color: '#8588b3', fontSize: 10 },
-  content: { padding: 18, paddingBottom: 36 },
-  fieldLabel: { color: '#ffffff', fontSize: 9, fontWeight: '700', marginTop: 16, marginBottom: 7 },
-  input: {
-    height: 44,
-    borderRadius: 22,
-    paddingHorizontal: 16,
-    color: '#ffffff',
-    backgroundColor: '#292d62',
-    fontSize: 11,
-  },
-  descriptionInput: { height: 62, paddingTop: 14, textAlignVertical: 'top' },
   select: {
-    height: 44,
-    borderRadius: 22,
-    paddingHorizontal: 16,
+    height: sizes.field,
+    paddingHorizontal: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#292d62',
-  },
-  selectText: { flex: 1, color: '#ffffff', fontSize: 11 },
-  placeholder: { color: '#8588b3' },
-  chevron: { color: '#8588b3', fontSize: 17 },
-  gameOptions: { marginTop: 5, borderRadius: 12, overflow: 'hidden', backgroundColor: '#292d62' },
-  option: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#383e7b' },
-  optionText: { color: '#ffffff', fontSize: 11 },
-  sectionTitle: { color: '#ffffff', fontSize: 12, fontWeight: '800', marginTop: 22, marginBottom: 10 },
-  emptyCards: {
-    height: 42,
-    borderRadius: 21,
+    borderRadius: radii.md,
+    backgroundColor: colors.glass,
     borderWidth: 1,
-    borderColor: '#686bff',
-    color: '#ddddE5',
+    borderColor: colors.border,
+  },
+  selectOpen: {
+    borderColor: colors.gold,
+    backgroundColor: colors.glassElevated,
+  },
+  selectText: { flex: 1, ...type.bodyMd, color: colors.textPrimary },
+  placeholder: { color: colors.textMuted },
+  chevron: { color: colors.textSecondary, fontSize: 17 },
+  gameOptions: {
+    marginTop: spacing.xxs,
+    padding: 0,
+    overflow: 'hidden',
+  },
+  option: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  optionBorder: { borderBottomWidth: 1, borderBottomColor: colors.borderSubtle },
+  optionText: { ...type.bodyMd, color: colors.textPrimary },
+  optionEmpty: {
+    ...type.bodyMd,
+    color: colors.textMuted,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  descriptionBox: { height: 96 },
+  section: { marginTop: spacing.lg },
+  errorText: {
+    ...type.bodySm,
+    color: colors.danger,
     textAlign: 'center',
-    paddingTop: 12,
-    fontSize: 11,
+    marginTop: spacing.md,
   },
-  errorText: { color: '#ff8f9c', fontSize: 11, textAlign: 'center', marginTop: 16 },
-  createButton: {
-    height: 42,
-    borderRadius: 22,
-    marginTop: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#625ff0',
-  },
-  createButtonText: { color: '#ffffff', fontSize: 12, fontWeight: '800' },
-  disabledButton: { opacity: 0.6 },
+  submit: { marginTop: spacing.lg },
 });
