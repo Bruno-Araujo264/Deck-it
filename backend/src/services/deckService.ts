@@ -1,14 +1,14 @@
 import prisma from '../db/client.js';
 
 export class DeckService {
-  public async createDeck(userId: number, gameId: number, name: string) {
+  public async createDeck(userId: number, gameId: number, name: string, imageData?: string) {
     const game = await prisma.game.findUnique({ where: { id: gameId } });
     if (!game) {
       throw new Error('Jogo não encontrado.');
     }
 
     return await prisma.userDeck.create({
-      data: { userId, gameId, name },
+      data: { userId, gameId, name, ...(imageData ? { imageData } : {}) },
       include: { game: { select: { name: true, slug: true } } },
     });
   }
@@ -27,7 +27,13 @@ export class DeckService {
     });
   }
 
-  public async updateDeck(userId: number, deckId: number, name: string) {
+  public async updateDeck(
+    userId: number,
+    deckId: number,
+    name: string,
+    gameId?: number,
+    imageData?: string,
+  ) {
     const deck = await prisma.userDeck.findFirst({
       where: { id: deckId, userId },
     });
@@ -36,9 +42,21 @@ export class DeckService {
       throw new Error('Deck não encontrado ou acesso negado.');
     }
 
+    if (gameId !== undefined) {
+      const game = await prisma.game.findUnique({ where: { id: gameId } });
+      if (!game) {
+        throw new Error('Jogo não encontrado.');
+      }
+    }
+
     return await prisma.userDeck.update({
       where: { id: deckId },
-      data: { name },
+      data: {
+        name,
+        ...(gameId !== undefined ? { gameId } : {}),
+        ...(imageData ? { imageData } : {}),
+      },
+      include: { game: { select: { name: true, slug: true } } },
     });
   }
 

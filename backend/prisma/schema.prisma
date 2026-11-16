@@ -48,6 +48,7 @@ model UserDeck {
   userId    Int      @map("user_id")
   gameId    Int      @map("game_id")
   name      String   @db.VarChar(100) // Ex: "Deck Competitivo Pauper", "Para Troca"
+  imageData String?  @map("image_data") @db.LongText
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -16,7 +16,7 @@ const app = express();
 app.use(cors());
 // O scanner envia a foto em base64: só essa rota aceita corpo grande.
 app.use("/api/scan", express.json({ limit: "8mb" }));
-app.use(express.json());
+app.use(express.json({ limit: '8mb' }));
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
