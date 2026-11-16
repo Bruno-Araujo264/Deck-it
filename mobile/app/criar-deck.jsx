@@ -1,11 +1,12 @@
+import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,48 +14,88 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { createDeck, getGames } from '../api/client';
+import { createDeck, deleteDeck, getDeckItems, getGames, updateDeck } from '../api/client';
 
 export default function CriarDeckScreen() {
   const { t } = useTranslation();
+  const { deckId: rawDeckId } = useLocalSearchParams();
+  const deckId = Array.isArray(rawDeckId) ? rawDeckId[0] : rawDeckId;
+  const isEditing = /^\d+$/.test(String(deckId ?? ''));
   const [games, setGames] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [coverImage, setCoverImage] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [isGamePickerOpen, setIsGamePickerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const [isLoadingDeck, setIsLoadingDeck] = useState(isEditing);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadGames() {
+    async function loadData() {
       try {
-        const availableGames = await getGames();
+        const [availableGames, deck] = await Promise.all([
+          getGames(),
+          isEditing ? getDeckItems(deckId) : Promise.resolve(null),
+        ]);
         if (isMounted) {
           setGames(availableGames);
+          if (deck) {
+            setName(deck.name);
+            setSelectedGame(deck.game);
+            if (deck.imageData) {
+              setCoverImage({ uri: deck.imageData, data: null });
+            }
+          }
         }
       } catch {
         if (isMounted) {
-          setError(t('erro_carregar_jogos'));
+          setError(isEditing ? t('erro_carregar_deck') : t('erro_carregar_jogos'));
         }
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          setIsLoadingDeck(false);
         }
       }
     }
 
-    loadGames();
+    loadData();
     return () => {
       isMounted = false;
     };
-  }, [t]);
+  }, [deckId, isEditing, t]);
 
+  async function pickCoverImage() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setError(t('permissao_galeria_negada'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets?.[0]?.base64) {
+      const asset = result.assets[0];
+      const mimeType = asset.mimeType ?? 'image/jpeg';
+      setCoverImage({
+        uri: asset.uri,
+        data: `data:${mimeType};base64,${asset.base64}`,
+      });
+    }
+  }
   async function handleCreateDeck() {
     setError('');
-
     if (!name.trim()) {
       setError(t('preencha_nome_deck'));
       return;
@@ -67,7 +108,15 @@ export default function CriarDeckScreen() {
 
     setIsSaving(true);
     try {
-      await createDeck(selectedGame.id, name.trim());
+      if (isEditing) {
+        await updateDeck(deckId, {
+          gameId: selectedGame.id,
+          name: name.trim(),
+          imageData: coverImage?.data,
+        });
+      } else {
+        await createDeck(selectedGame.id, name.trim(), coverImage?.data);
+      }
       router.replace('/(agrupamento)/home');
     } catch (requestError) {
       setError(requestError.message || t('erro_criar_deck'));
@@ -76,18 +125,40 @@ export default function CriarDeckScreen() {
     }
   }
 
+  function handleDeleteDeck() {
+    Alert.alert(
+      t('excluir_deck'),
+      t('confirmar_excluir_deck'),
+      [
+        { text: t('cancelar'), style: 'cancel' },
+        {
+          text: t('excluir'),
+          style: 'destructive',
+          onPress: async () => {
+            setIsDeleting(true);
+            setError('');
+            try {
+              await deleteDeck(deckId);
+              router.replace('/(agrupamento)/home');
+            } catch (requestError) {
+              setError(requestError.message || t('erro_excluir_deck'));
+              setIsDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar style="light" />
-      <KeyboardAvoidingView
-        style={styles.screen}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <View style={styles.screen}>
         <View style={styles.topBar}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
-          <Text style={styles.title}>{t('criar_deck')}</Text>
+          <Text style={styles.title}>{isEditing ? t('editar_deck') : t('criar_deck')}</Text>
           <Pressable onPress={() => router.back()}>
             <Text style={styles.cancelText}>{t('cancelar')}</Text>
           </Pressable>
@@ -108,10 +179,10 @@ export default function CriarDeckScreen() {
           <Pressable
             style={styles.select}
             onPress={() => setIsGamePickerOpen((open) => !open)}
-            disabled={isLoading}
+            disabled={isLoading || isLoadingDeck}
           >
             <Text style={[styles.selectText, !selectedGame && styles.placeholder]}>
-              {isLoading ? t('carregando') : selectedGame?.name ?? t('selecione_um_jogo')}
+              {isLoading || isLoadingDeck ? t('carregando') : selectedGame?.name ?? t('selecione_um_jogo')}
             </Text>
             <Text style={styles.chevron}>{isGamePickerOpen ? '⌃' : '⌄'}</Text>
           </Pressable>
@@ -147,6 +218,15 @@ export default function CriarDeckScreen() {
             multiline
           />
 
+          <FieldLabel text={t('imagem_do_deck')} />
+          <Pressable style={styles.coverPicker} onPress={pickCoverImage}>
+            {coverImage ? (
+              <Image source={{ uri: coverImage.uri }} style={styles.coverPreview} resizeMode="cover" />
+            ) : (
+              <Text style={styles.coverPickerText}>{t('selecionar_imagem_galeria')}</Text>
+            )}
+          </Pressable>
+
           <Text style={styles.sectionTitle}>{t('cartas_no_deck')}</Text>
           <Pressable onPress={() => router.push('/selecionar-carta')}>
             <Text style={styles.emptyCards}>{t('adicionar_cartas')}</Text>
@@ -157,14 +237,26 @@ export default function CriarDeckScreen() {
           <Pressable
             style={[styles.createButton, isSaving && styles.disabledButton]}
             onPress={handleCreateDeck}
-            disabled={isSaving}
+            disabled={isSaving || isDeleting}
           >
             <Text style={styles.createButtonText}>
-              {isSaving ? t('carregando') : t('criar_deck')}
+            {isSaving ? t('carregando') : isEditing ? t('salvar_alteracoes') : t('criar_deck')}
             </Text>
           </Pressable>
+
+          {isEditing ? (
+            <Pressable
+              style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+              onPress={handleDeleteDeck}
+              disabled={isSaving || isDeleting}
+            >
+              <Text style={styles.deleteButtonText}>
+                {isDeleting ? t('carregando') : t('excluir_deck')}
+              </Text>
+            </Pressable>
+          ) : null}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -208,6 +300,19 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   descriptionInput: { height: 62, paddingTop: 14, textAlignVertical: 'top' },
+  coverPicker: {
+    height: 150,
+    borderRadius: 16,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#292d62',
+    borderWidth: 1,
+    borderColor: '#686bff',
+    borderStyle: 'dashed',
+  },
+  coverPreview: { width: '100%', height: '100%' },
+  coverPickerText: { color: '#ddddE5', fontSize: 11 },
   select: {
     height: 44,
     borderRadius: 22,
@@ -243,5 +348,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#625ff0',
   },
   createButtonText: { color: '#ffffff', fontSize: 12, fontWeight: '800' },
+  deleteButton: {
+    height: 42,
+    borderRadius: 22,
+    marginTop: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#ff6878',
+  },
+  deleteButtonText: { color: '#ff8f9c', fontSize: 12, fontWeight: '800' },
   disabledButton: { opacity: 0.6 },
 });

@@ -2,8 +2,6 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -37,10 +35,7 @@ export default function LoginScreen() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <View style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -94,7 +89,7 @@ export default function LoginScreen() {
             </View>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </View>
     </Screen>
   );
 }

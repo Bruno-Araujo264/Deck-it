@@ -2,8 +2,6 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -56,10 +54,7 @@ export default function Cadastro() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <View style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -132,7 +127,7 @@ export default function Cadastro() {
             </View>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </View>
     </Screen>
   );
 }

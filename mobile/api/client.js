@@ -132,10 +132,33 @@ export async function addCardToDeck(deckId, cardExternalId, quantity = 1) {
   });
 }
 
-export async function createDeck(gameId, name) {
+export async function removeCardFromDeck(deckId, itemId) {
+  return request(`/decks/${deckId}/items/${itemId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function createDeck(gameId, name, imageData) {
   return request('/decks', {
     method: 'POST',
-    body: JSON.stringify({ gameId, name }),
+    body: JSON.stringify({ gameId, name, ...(imageData ? { imageData } : {}) }),
+  });
+}
+
+export async function updateDeck(deckId, { gameId, name, imageData }) {
+  return request(`/decks/${encodeURIComponent(deckId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      gameId,
+      name,
+      ...(imageData ? { imageData } : {}),
+    }),
+  });
+}
+
+export async function deleteDeck(deckId) {
+  return request(`/decks/${encodeURIComponent(deckId)}`, {
+    method: 'DELETE',
   });
 }
 

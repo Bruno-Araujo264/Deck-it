@@ -37,7 +37,9 @@ function cleanCardName(name) {
 
 export default function Adicionar() {
   const { t } = useTranslation();
-  const { deckId, gameId } = useLocalSearchParams();
+  const { deckId: rawDeckId, gameId: rawGameId } = useLocalSearchParams();
+  const deckId = Array.isArray(rawDeckId) ? rawDeckId[0] : rawDeckId;
+  const gameId = Array.isArray(rawGameId) ? rawGameId[0] : rawGameId;
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -72,6 +74,11 @@ export default function Adicionar() {
   }
 
   async function addToDeck(card) {
+    if (!/^\d+$/.test(String(deckId ?? ''))) {
+      Alert.alert(t('erro_identificar_carta'), t('deck_nao_selecionado'));
+      return;
+    }
+
     setAddingCardId(card.externalId);
     try {
       await addCardToDeck(deckId, card.externalId);
@@ -122,6 +129,10 @@ export default function Adicionar() {
   }
 
   function goToDeck() {
+    if (!/^\d+$/.test(String(deckId ?? ''))) {
+      return;
+    }
+
     router.replace({
       pathname: '/decks',
       params: { deckId: String(deckId), source: 'adicionar' },

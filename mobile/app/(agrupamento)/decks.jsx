@@ -15,7 +15,8 @@ import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export default function Decks() {
   const { t } = useTranslation();
-  const { source, deckId } = useLocalSearchParams();
+  const { source, deckId: rawDeckId } = useLocalSearchParams();
+  const deckId = Array.isArray(rawDeckId) ? rawDeckId[0] : rawDeckId;
   const [deck, setDeck] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,7 +30,7 @@ export default function Decks() {
     let isMounted = true;
 
     async function loadDeck() {
-      if (!deckId) {
+      if (!/^\d+$/.test(String(deckId ?? ''))) {
         setError(t('deck_nao_selecionado'));
         setIsLoading(false);
         return;
@@ -72,7 +73,14 @@ export default function Decks() {
           variant="page"
           title={deck?.name ?? t('decks')}
           onBack={goBack}
-          right={<IconButton icon="↗" accessibilityLabel="Editar deck" iconStyle={styles.editIcon} />}
+          right={
+            <IconButton
+              icon="⚙"
+              accessibilityLabel="Editar deck"
+              onPress={() => router.push({ pathname: '/criar-deck', params: { deckId: String(deckId) } })}
+              iconStyle={styles.editIcon}
+            />
+          }
           style={styles.header}
         />
 
@@ -113,21 +121,25 @@ export default function Decks() {
                 pathname: '/carta',
                 params: {
                   externalId: item.cardExternalId,
+                  deckId: String(deckId),
+                  itemId: String(item.id),
                   gameId: deck?.game?.id ? String(deck.game.id) : undefined,
                 },
               })}
             >
-              {item.cardDetails?.imageNormal ? (
-                <Image
-                  source={{ uri: item.cardDetails.imageNormal }}
-                  style={styles.cardImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={styles.cardImagePlaceholder}>
-                  <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
-                </View>
-              )}
+              <View style={styles.cardFrame}>
+                {item.cardDetails?.imageNormal ? (
+                  <Image
+                    source={{ uri: item.cardDetails.imageNormal }}
+                    style={styles.cardImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.cardImagePlaceholder}>
+                    <Text style={styles.placeholderText}>{t('imagem_indisponivel')}</Text>
+                  </View>
+                )}
+              </View>
               <Text style={styles.cardName} numberOfLines={1}>
                 {item.cardDetails?.name ?? item.cardExternalId}
               </Text>
@@ -172,9 +184,7 @@ const styles = StyleSheet.create({
     ...shadows.card,
   },
   cardImagePlaceholder: {
-    width: 150,
-    height: 200,
-    borderRadius: 2,
+    flex: 1,
     backgroundColor: '#292d62',
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, View, Pressable } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, View, Pressable } from 'react-native';
 import {AppHeader,
   GemChip,
   GlassCard,
@@ -15,6 +15,7 @@ export default function HomeScreen() {
 	const { t } = useTranslation();
 	const [categories, setCategories] = useState([]);
 	const [decks, setDecks] = useState([]);
+	const [selectedGameSlug, setSelectedGameSlug] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
 
@@ -51,12 +52,20 @@ export default function HomeScreen() {
 		};
 	}, []);
 
+	const visibleDecks = selectedGameSlug
+		? decks.filter((deck) => deck.game?.slug === selectedGameSlug)
+		: decks;
+
+	function toggleGameFilter(slug) {
+		setSelectedGameSlug((currentSlug) => (currentSlug === slug ? null : slug));
+	}
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
 			<FlatList
 				style={styles.list}
 				contentContainerStyle={styles.content}
-				data={decks}
+				data={visibleDecks}
 				keyExtractor={(deck) => String(deck.id)}
 				showsVerticalScrollIndicator={false}
 				ListHeaderComponent={
@@ -79,18 +88,29 @@ export default function HomeScreen() {
 							keyExtractor={(category) => String(category.id)}
 							showsHorizontalScrollIndicator={false}
 							contentContainerStyle={styles.categoryList}
-              renderItem={({ item }) => <GemChip label={item.name} game={item.slug} />}
+              renderItem={({ item }) => (
+								<GemChip
+									label={item.name}
+									game={item.slug}
+									active={selectedGameSlug === item.slug}
+									onPress={() => toggleGameFilter(item.slug)}
+								/>
+							)}
 						/>
 						{isLoading ? (
 							<Text style={[styles.statusText, styles.recentTitle]}>Carregando...</Text>
 						) : error ? (
 							<Text style={styles.errorText}>{error}</Text>
-						) : decks.length === 0 ? (
+						) : visibleDecks.length === 0 ? (
 							<View style={styles.emptyState}>
-								<Text style={styles.emptyTitle}>{t('sem_decks')}</Text>
-								<Pressable style={styles.createButton} onPress={() => router.push('/criar-deck')}>
-									<Text style={styles.createButtonText}>{t('criar_primeiro_deck')}</Text>
-								</Pressable>
+								<Text style={styles.emptyTitle}>
+									{selectedGameSlug ? t('nenhum_deck_jogo') : t('sem_decks')}
+								</Text>
+								{!selectedGameSlug ? (
+									<Pressable style={styles.createButton} onPress={() => router.push('/criar-deck')}>
+										<Text style={styles.createButtonText}>{t('criar_primeiro_deck')}</Text>
+									</Pressable>
+								) : null}
 							</View>
 						) : (
             <SectionLabel style={styles.recentLabel}>{t('decks_recentes')}</SectionLabel>
@@ -102,7 +122,11 @@ export default function HomeScreen() {
           return (
             <GlassCard glowColor={gem} onPress={() => {router.push({ pathname: '/decks', params: { deckId: String(item.id) } })}} style={styles.deckCard}>
               <View style={[styles.deckImage, { borderColor: `${gem}66` }]}>
-                <Text style={[styles.imageLabel, { color: gem }]}>IMAGE</Text>
+                {item.imageData ? (
+                  <Image source={{ uri: item.imageData }} style={styles.deckCoverImage} />
+                ) : (
+                  <Text style={[styles.imageLabel, { color: gem }]}>IMAGE</Text>
+                )}
               </View>
 
               <View style={styles.deckInfo}>
@@ -157,6 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.bgDeepest,
   },
+  deckCoverImage: { width: '100%', height: '100%', resizeMode: 'cover', borderRadius: radii.sm },
   imageLabel: { ...type.labelSm, fontSize: 8, opacity: 0.8 },
   deckInfo: { flex: 1, gap: 3 },
   gameTag: { alignSelf: 'flex-start' },

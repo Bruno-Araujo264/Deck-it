@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { getCard, getCardMarket } from '../api/client';
+import { getCard, getCardMarket, removeCardFromDeck } from '../api/client';
 import {
   AddToDeckSheet,
   AppHeader,
@@ -75,13 +75,25 @@ function gameFacts(attrs, t) {
 
 export default function Carta() {
   const { t } = useTranslation();
-  const { externalId, gameId, source } = useLocalSearchParams();
+  const {
+    externalId: rawExternalId,
+    gameId: rawGameId,
+    source: rawSource,
+    deckId: rawDeckId,
+    itemId: rawItemId,
+  } = useLocalSearchParams();
+  const externalId = Array.isArray(rawExternalId) ? rawExternalId[0] : rawExternalId;
+  const gameId = Array.isArray(rawGameId) ? rawGameId[0] : rawGameId;
+  const source = Array.isArray(rawSource) ? rawSource[0] : rawSource;
+  const deckId = Array.isArray(rawDeckId) ? rawDeckId[0] : rawDeckId;
+  const itemId = Array.isArray(rawItemId) ? rawItemId[0] : rawItemId;
   const [card, setCard] = useState(null);
   const [market, setMarket] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarketLoading, setIsMarketLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,6 +150,33 @@ export default function Carta() {
         onPress: () => router.replace({ pathname: '/decks', params: { deckId: String(deck.id) } }),
       },
     ]);
+  }
+
+  function handleRemove() {
+    Alert.alert(
+      t('confirmar_apagar_carta'),
+      t('confirmar_apagar_carta_mensagem'),
+      [
+        { text: t('cancelar'), style: 'cancel' },
+        {
+          text: t('apagar_carta'),
+          style: 'destructive',
+          onPress: async () => {
+            setIsRemoving(true);
+            try {
+              await removeCardFromDeck(deckId, itemId);
+              Alert.alert(t('carta_apagada'), undefined, [
+                { text: 'OK', onPress: () => router.replace({ pathname: '/decks', params: { deckId } }) },
+              ]);
+            } catch (requestError) {
+              setError(requestError.message);
+            } finally {
+              setIsRemoving(false);
+            }
+          },
+        },
+      ],
+    );
   }
 
   const attrs = parseAttributes(card?.attributes);
@@ -270,9 +309,16 @@ export default function Carta() {
               </View>
             ) : null}
 
-            {source !== 'scanner' ? (
+            {source !== 'scanner' && deckId && itemId ? (
               <View style={styles.actions}>
-                <Button label={t('apagar_carta')} variant="danger" size="sm" style={styles.action} />
+                <Button
+                  label={isRemoving ? t('carregando') : t('apagar_carta')}
+                  variant="danger"
+                  size="sm"
+                  style={styles.action}
+                  onPress={handleRemove}
+                  disabled={isRemoving}
+                />
                 <Button label={t('editar_carta')} variant="secondary" size="sm" style={styles.action} />
               </View>
             ) : null}
